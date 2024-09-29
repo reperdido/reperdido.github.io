@@ -113,7 +113,7 @@
     margin-top: 0% ;
     justify-content: center;
     align-items: center;
-    margin-left: 50%;
+    margin-left: 60%;
     margin-top: 10px;
     margin-bottom: 0px;
              
@@ -351,15 +351,15 @@
                 var countryItem = document.createElement('div');
                 countryItem.classList.add('country-item');
 
-                // Crea el ícono de la bandera
+               
                 var flagIcon = document.createElement('span');
                 flagIcon.classList.add('flag-icon', 'flag-icon-' + pais.codigo, 'flag');
 
-                // Crea el texto con el nombre del país
+                
                 var countryName = document.createElement('span');
                 countryName.textContent = pais.nombre;
 
-                // Añade la bandera y el nombre del país a la lista
+               
                 countryItem.appendChild(flagIcon);
                 countryItem.appendChild(countryName);
                 countryList.appendChild(countryItem);
