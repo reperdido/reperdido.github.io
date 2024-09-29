@@ -19,4 +19,4 @@ esa persona aún tiene una última oportunidad de salvarse: se le dará una list
 palabras, y si adivina cuál era la correcta, ¡se lleva la victoria! Si no lo logra, el 
 grupo será el ganador.
 
-juega aquí: [pumpkinbin.github.io](https://pumpkinbin.github.io/)
+juega [aquí](reperdido.github.io )
