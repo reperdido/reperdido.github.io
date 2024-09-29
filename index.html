@@ -6,9 +6,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Schoolbell&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Re perdido! El juego </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
+    <title>Re perdido! El juego</title>
     <style>
+        .flag {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        .country-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
         
+        }
         body {
                 font-family: "Schoolbell", cursive;
     margin: 0;
@@ -30,6 +40,8 @@
             border-radius: 10px;
             padding: 20px;
             display: grid;
+            justify-content: center;
+    align-items: center;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -55,9 +67,7 @@
     font-size: 1em;
     
         }
-        
-button {
-            
+    button {
     font-family: "Fredoka", sans-serif;
     padding: 15px;
             background-color: #FFB703;
@@ -100,11 +110,15 @@ button {
         .logo {
             width: 100%; 
     max-width: 300px; 
-    margin-top: 80% ;
+    margin-top: 0% ;
+    justify-content: center;
+    align-items: center;
+    margin-left: 50%;
+    margin-top: 10px;
+    margin-bottom: 0px;
              
         }
 
-        /* Estilos del modal */
         .modal {
             font-family: "Fredoka", sans-serif;
             display: none;
@@ -231,9 +245,129 @@ button {
 "Dead Cells", "Disco Elysium", "Doom", "Metro Exodus", "Shadow of the Tomb Raider", "Far Cry",
 "Mortal Kombat", "Tekken", "Street Fighter", "The Witcher", "Final Fantasy", "Resident Evil"
 ];
-    var paises=[
-        "Afganistán", "Albania", "Alemania", "Andorra", "Angola", "Antigua y Barbuda", "Arabia Saudita", "Argelia", "Argentina", "Armenia", "Australia", "Austria", "Azerbaiyán", "Bahamas", "Bangladés", "Barbados", "Baréin", "Bélgica", "Belice", "Benín", "Bielorrusia", "Birmania", "Bolivia", "Bosnia y Herzegovina", "Botsuana", "Brasil", "Brunéi", "Bulgaria", "Burkina Faso", "Burundi", "Bután", "Cabo Verde", "Camboya", "Camerún", "Canadá", "Catar", "Chad", "Chile", "China", "Chipre", "Ciudad del Vaticano", "Colombia", "Comoras", "Corea del Norte", "Corea del Sur", "Costa de Marfil", "Costa Rica", "Croacia", "Cuba", "Dinamarca", "Dominica", "Ecuador", "Egipto", "El Salvador", "Emiratos Árabes Unidos", "Eritrea", "Eslovaquia", "Eslovenia", "España", "Estados Unidos", "Estonia", "Esuatini", "Etiopía", "Filipinas", "Finlandia", "Fiyi", "Francia", "Gabón", "Gambia", "Georgia", "Ghana", "Granada", "Grecia", "Guatemala", "Guinea", "Guinea-Bisáu", "Guinea Ecuatorial", "Guyana", "Haití", "Honduras", "Hungría", "India", "Indonesia", "Irak", "Irán", "Irlanda", "Islandia", "Islas Marshall", "Islas Salomón", "Israel", "Italia", "Jamaica", "Japón", "Jordania", "Kazajistán", "Kenia", "Kirguistán", "Kiribati", "Kuwait", "Laos", "Lesoto", "Letonia", "Líbano", "Liberia", "Libia", "Liechtenstein", "Lituania", "Luxemburgo", "Madagascar", "Malasia", "Malaui", "Maldivas", "Malí", "Malta", "Marruecos", "Mauricio", "Mauritania", "México", "Micronesia", "Moldavia", "Mónaco", "Mongolia", "Montenegro", "Mozambique", "Namibia", "Nauru", "Nepal", "Nicaragua", "Níger", "Nigeria", "Noruega", "Nueva Zelanda", "Omán", "Países Bajos", "Pakistán", "Palaos", "Panamá", "Papúa Nueva Guinea", "Paraguay", "Perú", "Polonia", "Portugal", "Reino Unido", "República Centroafricana", "República Checa", "República del Congo", "República Democrática del Congo", "República Dominicana", "Ruanda", "Rumanía", "Rusia", "Samoa", "San Cristóbal y Nieves", "San Marino", "San Vicente y las Granadinas", "Santa Lucía", "Santo Tomé y Príncipe", "Senegal", "Serbia", "Seychelles", "Sierra Leona", "Singapur", "Siria", "Somalia", "Sri Lanka", "Sudáfrica", "Sudán", "Sudán del Sur", "Suecia", "Suiza", "Surinam", "Tailandia", "Tanzania", "Tayikistán", "Timor Oriental", "Togo", "Tonga", "Trinidad y Tobago", "Túnez", "Turkmenistán", "Turquía", "Tuvalu", "Ucrania", "Uganda", "Uruguay", "Uzbekistán", "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Yibuti", "Zambia", "Zimbabue"
-    ];
+    var paises = [
+            { nombre: "Afganistán", codigo: "af" }, { nombre: "Albania", codigo: "al" }, 
+            { nombre: "Alemania", codigo: "de" }, { nombre: "Andorra", codigo: "ad" }, 
+            { nombre: "Angola", codigo: "ao" }, { nombre: "Antigua y Barbuda", codigo: "ag" }, 
+            { nombre: "Arabia Saudita", codigo: "sa" }, { nombre: "Argelia", codigo: "dz" }, 
+            { nombre: "Argentina", codigo: "ar" }, { nombre: "Armenia", codigo: "am" }, 
+            { nombre: "Australia", codigo: "au" }, { nombre: "Austria", codigo: "at" }, 
+            { nombre: "Azerbaiyán", codigo: "az" }, { nombre: "Bahamas", codigo: "bs" }, 
+            { nombre: "Bangladés", codigo: "bd" }, { nombre: "Barbados", codigo: "bb" }, 
+            { nombre: "Baréin", codigo: "bh" }, { nombre: "Bélgica", codigo: "be" }, 
+            { nombre: "Belice", codigo: "bz" }, { nombre: "Benín", codigo: "bj" }, 
+            { nombre: "Bielorrusia", codigo: "by" }, { nombre: "Birmania", codigo: "mm" }, 
+            { nombre: "Bolivia", codigo: "bo" }, { nombre: "Bosnia y Herzegovina", codigo: "ba" }, 
+            { nombre: "Botsuana", codigo: "bw" }, { nombre: "Brasil", codigo: "br" }, 
+            { nombre: "Brunéi", codigo: "bn" }, { nombre: "Bulgaria", codigo: "bg" }, 
+            { nombre: "Burkina Faso", codigo: "bf" }, { nombre: "Burundi", codigo: "bi" }, 
+            { nombre: "Bután", codigo: "bt" }, { nombre: "Cabo Verde", codigo: "cv" }, 
+            { nombre: "Camboya", codigo: "kh" }, { nombre: "Camerún", codigo: "cm" }, 
+            { nombre: "Canadá", codigo: "ca" }, { nombre: "Catar", codigo: "qa" }, 
+            { nombre: "Chad", codigo: "td" }, { nombre: "Chile", codigo: "cl" }, 
+            { nombre: "China", codigo: "cn" }, { nombre: "Chipre", codigo: "cy" }, 
+            { nombre: "Ciudad del Vaticano", codigo: "va" }, { nombre: "Colombia", codigo: "co" }, 
+            { nombre: "Comoras", codigo: "km" }, { nombre: "Corea del Norte", codigo: "kp" }, 
+            { nombre: "Corea del Sur", codigo: "kr" }, { nombre: "Costa de Marfil", codigo: "ci" }, 
+            { nombre: "Costa Rica", codigo: "cr" }, { nombre: "Croacia", codigo: "hr" }, 
+            { nombre: "Cuba", codigo: "cu" }, { nombre: "Dinamarca", codigo: "dk" }, 
+            { nombre: "Dominica", codigo: "dm" }, { nombre: "Ecuador", codigo: "ec" }, 
+            { nombre: "Egipto", codigo: "eg" }, { nombre: "El Salvador", codigo: "sv" }, 
+            { nombre: "Emiratos Árabes Unidos", codigo: "ae" }, { nombre: "Eritrea", codigo: "er" }, 
+            { nombre: "Eslovaquia", codigo: "sk" }, { nombre: "Eslovenia", codigo: "si" }, 
+            { nombre: "España", codigo: "es" }, { nombre: "Estados Unidos", codigo: "us" }, 
+            { nombre: "Estonia", codigo: "ee" }, { nombre: "Esuatini", codigo: "sz" }, 
+            { nombre: "Etiopía", codigo: "et" }, { nombre: "Filipinas", codigo: "ph" }, 
+            { nombre: "Finlandia", codigo: "fi" }, { nombre: "Fiyi", codigo: "fj" }, 
+            { nombre: "Francia", codigo: "fr" }, { nombre: "Gabón", codigo: "ga" }, 
+            { nombre: "Gambia", codigo: "gm" }, { nombre: "Georgia", codigo: "ge" }, 
+            { nombre: "Ghana", codigo: "gh" }, { nombre: "Granada", codigo: "gd" }, 
+            { nombre: "Grecia", codigo: "gr" }, { nombre: "Guatemala", codigo: "gt" }, 
+            { nombre: "Guinea", codigo: "gn" }, { nombre: "Guinea-Bisáu", codigo: "gw" }, 
+            { nombre: "Guinea Ecuatorial", codigo: "gq" }, { nombre: "Guyana", codigo: "gy" }, 
+            { nombre: "Haití", codigo: "ht" }, { nombre: "Honduras", codigo: "hn" }, 
+            { nombre: "Hungría", codigo: "hu" }, { nombre: "India", codigo: "in" }, 
+            { nombre: "Indonesia", codigo: "id" }, { nombre: "Irak", codigo: "iq" }, 
+            { nombre: "Irán", codigo: "ir" }, { nombre: "Irlanda", codigo: "ie" }, 
+            { nombre: "Islandia", codigo: "is" }, { nombre: "Islas Marshall", codigo: "mh" }, 
+            { nombre: "Islas Salomón", codigo: "sb" }, { nombre: "Israel", codigo: "il" }, 
+            { nombre: "Italia", codigo: "it" }, { nombre: "Jamaica", codigo: "jm" }, 
+            { nombre: "Japón", codigo: "jp" }, { nombre: "Jordania", codigo: "jo" }, 
+            { nombre: "Kazajistán", codigo: "kz" }, { nombre: "Kenia", codigo: "ke" }, 
+            { nombre: "Kirguistán", codigo: "kg" }, { nombre: "Kiribati", codigo: "ki" }, 
+            { nombre: "Kuwait", codigo: "kw" }, { nombre: "Laos", codigo: "la" }, 
+            { nombre: "Lesoto", codigo: "ls" }, { nombre: "Letonia", codigo: "lv" }, 
+            { nombre: "Líbano", codigo: "lb" }, { nombre: "Liberia", codigo: "lr" }, 
+            { nombre: "Libia", codigo: "ly" }, { nombre: "Liechtenstein", codigo: "li" }, 
+            { nombre: "Lituania", codigo: "lt" }, { nombre: "Luxemburgo", codigo: "lu" }, 
+            { nombre: "Madagascar", codigo: "mg" }, { nombre: "Malasia", codigo: "my" }, 
+            { nombre: "Malaui", codigo: "mw" }, { nombre: "Maldivas", codigo: "mv" }, 
+            { nombre: "Malí", codigo: "ml" }, { nombre: "Malta", codigo: "mt" }, 
+            { nombre: "Marruecos", codigo: "ma" }, { nombre: "Mauricio", codigo: "mu" }, 
+            { nombre: "Mauritania", codigo: "mr" }, { nombre: "México", codigo: "mx" }, 
+            { nombre: "Micronesia", codigo: "fm" }, { nombre: "Moldavia", codigo: "md" }, 
+            { nombre: "Mónaco", codigo: "mc" }, { nombre: "Mongolia", codigo: "mn" }, 
+            { nombre: "Montenegro", codigo: "me" }, { nombre: "Mozambique", codigo: "mz" }, 
+            { nombre: "Namibia", codigo: "na" }, { nombre: "Nauru", codigo: "nr" }, 
+            { nombre: "Nepal", codigo: "np" }, { nombre: "Nicaragua", codigo: "ni" }, 
+            { nombre: "Níger", codigo: "ne" }, { nombre: "Nigeria", codigo: "ng" }, 
+            { nombre: "Noruega", codigo: "no" }, { nombre: "Nueva Zelanda", codigo: "nz" }, 
+            { nombre: "Omán", codigo: "om" }, { nombre: "Países Bajos", codigo: "nl" }, 
+            { nombre: "Pakistán", codigo: "pk" }, { nombre: "Palaos", codigo: "pw" }, 
+            { nombre: "Panamá", codigo: "pa" }, { nombre: "Papúa Nueva Guinea", codigo: "pg" }, 
+            { nombre: "Paraguay", codigo: "py" }, { nombre: "Perú", codigo: "pe" }, 
+            { nombre: "Polonia", codigo: "pl" }, { nombre: "Portugal", codigo: "pt" }, 
+            { nombre: "Reino Unido", codigo: "gb" }, { nombre: "República Centroafricana", codigo: "cf" }, 
+            { nombre: "República Checa", codigo: "cz" }, { nombre: "República del Congo", codigo: "cg" }, 
+            { nombre: "República Democrática del Congo", codigo: "cd" }, { nombre: "República Dominicana", codigo: "do" }, 
+            { nombre: "Ruanda", codigo: "rw" }, { nombre: "Rumanía", codigo: "ro" }, 
+            { nombre: "Rusia", codigo: "ru" }, { nombre: "Samoa", codigo: "ws" }, 
+            { nombre: "San Cristóbal y Nieves", codigo: "kn" }, { nombre: "San Marino", codigo: "sm" }, 
+            { nombre: "San Vicente y las Granadinas", codigo: "vc" }, { nombre: "Santa Lucía", codigo: "lc" }, 
+            { nombre: "Santo Tomé y Príncipe", codigo: "st" }, { nombre: "Senegal", codigo: "sn" }, 
+            { nombre: "Serbia", codigo: "rs" }, { nombre: "Seychelles", codigo: "sc" }, 
+            { nombre: "Sierra Leona", codigo: "sl" }, { nombre: "Singapur", codigo: "sg" }, 
+            { nombre: "Siria", codigo: "sy" }, { nombre: "Somalia", codigo: "so" }, 
+            { nombre: "Sri Lanka", codigo: "lk" }, { nombre: "Sudáfrica", codigo: "za" }, 
+            { nombre: "Sudán", codigo: "sd" }, { nombre: "Sudán del Sur", codigo: "ss" }, 
+            { nombre: "Suecia", codigo: "se" }, { nombre: "Suiza", codigo: "ch" }, 
+            { nombre: "Surinam", codigo: "sr" }, { nombre: "Tailandia", codigo: "th" }, 
+            { nombre: "Tanzania", codigo: "tz" }, { nombre: "Tayikistán", codigo: "tj" }, 
+            { nombre: "Timor Oriental", codigo: "tl" }, { nombre: "Togo", codigo: "tg" }, 
+            { nombre: "Tonga", codigo: "to" }, { nombre: "Trinidad y Tobago", codigo: "tt" }, 
+            { nombre: "Túnez", codigo: "tn" }, { nombre: "Turkmenistán", codigo: "tm" }, 
+            { nombre: "Turquía", codigo: "tr" }, { nombre: "Tuvalu", codigo: "tv" }, 
+            { nombre: "Ucrania", codigo: "ua" }, { nombre: "Uganda", codigo: "ug" }, 
+            { nombre: "Uruguay", codigo: "uy" }, { nombre: "Uzbekistán", codigo: "uz" }, 
+            { nombre: "Vanuatu", codigo: "vu" }, { nombre: "Venezuela", codigo: "ve" }, 
+            { nombre: "Vietnam", codigo: "vn" }, { nombre: "Yemen", codigo: "ye" }, 
+            { nombre: "Yibuti", codigo: "dj" }, { nombre: "Zambia", codigo: "zm" }, 
+            { nombre: "Zimbabue", codigo: "zw" }
+        ];
+
+        function mostrarPaisesConBanderas() {
+            var countryList = document.getElementById('countryList');
+            paises.forEach(function(pais) {
+                var countryItem = document.createElement('div');
+                countryItem.classList.add('country-item');
+
+                // Crea el ícono de la bandera
+                var flagIcon = document.createElement('span');
+                flagIcon.classList.add('flag-icon', 'flag-icon-' + pais.codigo, 'flag');
+
+                // Crea el texto con el nombre del país
+                var countryName = document.createElement('span');
+                countryName.textContent = pais.nombre;
+
+                // Añade la bandera y el nombre del país a la lista
+                countryItem.appendChild(flagIcon);
+                countryItem.appendChild(countryName);
+                countryList.appendChild(countryItem);
+            });
+        }
+
+        mostrarPaisesConBanderas();
+        
     var peliculas= ["El Padrino", "La Lista de Schindler", "Forrest Gump", "Titanic", "Avatar", "Inception",
 "El Señor de los Anillos", "Pulp Fiction", "The Dark Knight", "Fight Club", "Star Wars",
 "Jurassic Park", "Matrix", "Gladiator", "El Rey León", "Harry Potter", "Casablanca",
@@ -281,6 +415,7 @@ var animes = [
         var turno = 0;
         var modoJuego = "re_perdido";
 
+
         function seleccionarModo() {
             modoJuego = document.getElementById("modo").value;
         }
@@ -300,7 +435,7 @@ var animes = [
             setTimeout(function() {
                 participantes.splice(index, 1);
                 actualizarParticipantes();
-            }, 500);  // Tiempo para la animación antes de eliminarlo
+            }, 500); 
         }
 
         function actualizarParticipantes() {
@@ -395,20 +530,52 @@ var animes = [
             }
         }
         function verPalabra() {
-            if (turno < participantes.length) {
-                if (turno === azar) {
-                    if (modoJuego === "re_perdido") {
-                        document.getElementById("palabra").innerHTML = "Estas re perdido " + participantes[turno] + "!";
-                    } else if (modoJuego === "requete_perdido") {
-                        document.getElementById("palabra").innerHTML = participantes[turno] + ", la palabra es: " + palabraRequete;
-                    }
+    if (turno < participantes.length) {
+        var palabraContainer = document.getElementById("palabra");
+        palabraContainer.innerHTML = ""; 
+
+        if (turno === azar) {
+            if (modoJuego === "re_perdido") {
+                document.getElementById("palabra").innerHTML = "¡Estas re perdido, " + participantes[turno] + "!";
+            } else if (modoJuego === "requete_perdido") {
+                
+                if (typeof palabraRequete === 'object') {
+                    var flagIcon = document.createElement('span');
+                    flagIcon.classList.add('flag-icon', 'flag-icon-' + palabraRequete.codigo, 'flag');
+
+                    var countryName = document.createElement('span');
+                    countryName.textContent = palabraRequete.nombre;
+
+            
+                    palabraContainer.appendChild(flagIcon);
+                    palabraContainer.appendChild(countryName);
                 } else {
-                    document.getElementById("palabra").innerHTML = participantes[turno] + ", la palabra es: " + palabra;
+            
+                    document.getElementById("palabra").innerHTML = participantes[turno] + ", la palabra es: " + palabraRequete;
                 }
-                document.getElementById("verPalabra").disabled = true;
-                document.getElementById("pasarTurno").disabled = false;
+            }
+        } else {
+            if (typeof palabra === 'object') {
+
+                var flagIcon = document.createElement('span');
+                flagIcon.classList.add('flag-icon', 'flag-icon-' + palabra.codigo, 'flag');
+
+                var countryName = document.createElement('span');
+                countryName.textContent = palabra.nombre;
+
+                palabraContainer.appendChild(flagIcon);
+                palabraContainer.appendChild(countryName);
+            } else {
+                document.getElementById("palabra").innerHTML = participantes[turno] + ", la palabra es: " + palabra;
             }
         }
+
+        document.getElementById("verPalabra").disabled = true;
+        document.getElementById("pasarTurno").disabled = false;
+    }
+}
+
+
         function pasarTurno() {
             turno++;
             mostrarTurno();
