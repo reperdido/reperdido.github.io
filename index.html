@@ -345,28 +345,6 @@
             { nombre: "Zimbabue", codigo: "zw" }
         ];
 
-        function mostrarPaisesConBanderas() {
-            var countryList = document.getElementById('countryList');
-            paises.forEach(function(pais) {
-                var countryItem = document.createElement('div');
-                countryItem.classList.add('country-item');
-
-               
-                var flagIcon = document.createElement('span');
-                flagIcon.classList.add('flag-icon', 'flag-icon-' + pais.codigo, 'flag');
-
-                
-                var countryName = document.createElement('span');
-                countryName.textContent = pais.nombre;
-
-               
-                countryItem.appendChild(flagIcon);
-                countryItem.appendChild(countryName);
-                countryList.appendChild(countryItem);
-            });
-        }
-
-        mostrarPaisesConBanderas();
         
     var peliculas= ["El Padrino", "La Lista de Schindler", "Forrest Gump", "Titanic", "Avatar", "Inception",
 "El Señor de los Anillos", "Pulp Fiction", "The Dark Knight", "Fight Club", "Star Wars",
@@ -409,6 +387,29 @@ var animes = [
     "Berserk", "Psycho-Pass", "Hellsing", "Tokyo Revengers", "Zankyou no Terror"
 ];
 
+function mostrarPaisesConBanderas() {
+            var countryList = document.getElementById('countryList');
+            paises.forEach(function(pais) {
+                var countryItem = document.createElement('div');
+                countryItem.classList.add('country-item');
+
+               
+                var flagIcon = document.createElement('span');
+                flagIcon.classList.add('flag-icon', 'flag-icon-' + pais.codigo, 'flag');
+
+                
+                var countryName = document.createElement('span');
+                countryName.textContent = pais.nombre;
+
+               
+                countryItem.appendChild(flagIcon);
+                countryItem.appendChild(countryName);
+                countryList.appendChild(countryItem);
+            });
+        }
+
+        mostrarPaisesConBanderas();
+        
         var palabra = "";
         var palabraRequete = "";
         var azar = 0;
