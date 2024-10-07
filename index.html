@@ -387,34 +387,7 @@ var animes = [
     "Berserk", "Psycho-Pass", "Hellsing", "Tokyo Revengers", "Zankyou no Terror"
 ];
 
-function mostrarPaisesConBanderas() {
-            var countryList = document.getElementById('countryList');
-            paises.forEach(function(pais) {
-                var countryItem = document.createElement('div');
-                countryItem.classList.add('country-item');
 
-               
-                var flagIcon = document.createElement('span');
-                flagIcon.classList.add('flag-icon', 'flag-icon-' + pais.codigo, 'flag');
-
-                
-                var countryName = document.createElement('span');
-                countryName.textContent = pais.nombre;
-
-               
-                countryItem.appendChild(flagIcon);
-                countryItem.appendChild(countryName);
-                countryList.appendChild(countryItem);
-            });
-        }
-
-        mostrarPaisesConBanderas();
-        
-        var palabra = "";
-        var palabraRequete = "";
-        var azar = 0;
-        var turno = 0;
-        var modoJuego = "re_perdido";
 
 
         function seleccionarModo() {
@@ -447,7 +420,35 @@ function mostrarPaisesConBanderas() {
                     `<div class="participant" id="participant-${index}" onclick="eliminarParticipante(${index})">${nombre}</div>`;
             });
         }
+function mostrarPaisesConBanderas() {
+            var countryList = document.getElementById('countryList');
+            paises.forEach(function(pais) {
+                var countryItem = document.createElement('div');
+                countryItem.classList.add('country-item');
 
+               
+                var flagIcon = document.createElement('span');
+                flagIcon.classList.add('flag-icon', 'flag-icon-' + pais.codigo, 'flag');
+
+                
+                var countryName = document.createElement('span');
+                countryName.textContent = pais.nombre;
+
+               
+                countryItem.appendChild(flagIcon);
+                countryItem.appendChild(countryName);
+                countryList.appendChild(countryItem);
+            });
+        }
+
+        mostrarPaisesConBanderas();
+        
+        var palabra = "";
+        var palabraRequete = "";
+        var azar = 0;
+        var turno = 0;
+        var modoJuego = "re_perdido";
+        
         function iniciarJuego() {
             if (participantes.length > 0) {
                 azar = Math.floor(Math.random() * participantes.length);
