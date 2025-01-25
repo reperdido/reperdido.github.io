@@ -1,704 +1,477 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Schoolbell&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>¡Re Perdido! - El Juego</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
-    <title>Re perdido! El juego</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
-        .flag {
-            font-size: 24px;
-            margin-right: 10px;
+        /* ===== BASE STYLES ===== */
+        :root {
+            --primary: #1A1A2E;
+            --secondary: #16213E;
+            --accent: #E94560;
+            --text: #FFFFFF;
+            --success: #00B894;
+            --warning: #FDCB6E;
+            --danger: #D63031;
         }
-        .country-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        
-        }
+
         body {
-                font-family: "Schoolbell", cursive;
-    margin: 0;
-    padding: 0;
-    background-color: #023047;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    color: #FFFFFF;
-    text-align: center;
-         }
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--primary);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
         .container {
-            font-family: "Fredoka", sans-serif;
-            width: 90%;
             max-width: 800px;
-            background-color: #219ebc;
-            border-radius: 10px;
-            padding: 20px;
-            display: grid;
-            justify-content: center;
-    align-items: center;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        h1 {
-            font-family: "Fredoka", sans-serif;
-            font-size: 2.5em;
-            color: #FFFFFF;
-            grid-column: span 2;
-        }
-
-        button2 {
-            font-family: "Fredoka", sans-serif;
-    position: fixed; 
-    top: 10px;       
-    left: 10px;      
-    background-color: #a71616;
-    padding: 10px 15px;
-    text-decoration: none;
-    color: white;
-    border-radius: 10px;
-    font-size: 1em;
-    
-        }
-    button {
-    font-family: "Fredoka", sans-serif;
-    padding: 15px;
-            background-color: #FFB703;
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
             width: 100%;
-        }
-    
-        input, select {
-            font-family: "Fredoka", sans-serif;
-    padding: 20px 20px;
-    margin-left: 0%;
-    margin-right: 5%;
-    margin-top: 10px;
-    margin-bottom: 0px;
-    color: white;
-    background-color: #FFB703;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.2em;
-    width: 100%; 
-    box-sizing: border-box;
-    text-align: center;
+            background: var(--secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
-        input {
-            background-color: #8ECAE6; 
-            color: #023047; 
+        /* ===== HEADER ===== */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        select {
-            background-color: #8ECAE6; 
-            color: #023047;
-        }
         .logo {
-            width: 100%; 
-    max-width: 300px; 
-    margin-top: 0% ;
-    justify-content: center;
-    align-items: center;
-    margin-left: 60%;
-    margin-top: 10px;
-    margin-bottom: 0px;
-             
+            max-width: 150px;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
         }
 
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ===== PLAYER MANAGEMENT ===== */
+        .player-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        #playerList {
+            min-height: 120px;
+            margin: 1rem 0;
+        }
+
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            background: var(--accent);
+            border-radius: 10px;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+
+        .player-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .remove-btn {
+            background: var(--danger);
+            border: none;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            font-size: 0.8em;
+        }
+
+        /* ===== GAME CONTROLS ===== */
+        .controls {
+            display: grid;
+            gap: 0.75rem;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            margin: 1.5rem 0;
+        }
+
+        button {
+            background: var(--accent);
+            border: none;
+            color: var(--text);
+            padding: 0.75rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ===== GAME DISPLAY ===== */
+        #turnDisplay {
+            text-align: center;
+            font-size: 1.25rem;
+            margin: 1.5rem 0;
+            min-height: 40px;
+        }
+
+        #wordDisplay {
+            font-size: 1.75rem;
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin: 1.5rem 0;
+            transition: all 0.5s ease;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .impostor {
+            color: var(--warning);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* ===== MODALS ===== */
         .modal {
-            font-family: "Fredoka", sans-serif;
             display: none;
             position: fixed;
-            z-index: 1;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             justify-content: center;
             align-items: center;
+            z-index: 1000;
         }
 
         .modal-content {
-            
-            background-color: #219ebc;
-            padding: 20px;
-            border-radius: 10px;
+            background: var(--secondary);
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 500px;
             width: 90%;
-            max-width: 400px;
-            text-align: center;
-            color: #fff;
+            position: relative;
         }
 
-        .close {
-            color: white;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .participant {
-            background-color: #FB8500;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out, opacity 0.5s ease;
-        }
-
-        .participant:hover {
-            transform: scale(1.05);
-        }
-
-        .participant.remove {
-            opacity: 0;
-            transform: scale(0.5);
+        /* ===== MOBILE OPTIMIZATION ===== */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            button {
+                font-size: 0.9rem;
+                padding: 0.6rem;
+            }
+            
+            #wordDisplay {
+                font-size: 1.5rem;
+                padding: 1rem;
+            }
         }
     </style>
-    
-    <script>
-        var participantes = [];
-        var deportes = ["fútbol", "baloncesto", "tenis", "golf", "natación", "ciclismo", "boxeo", "atletismo","voleibol", "béisbol", "rugby", "hockey", "esgrima", "esquí", "patinaje", "surf","karate", "taekwondo", "judo", "levantamiento de pesas", "carreras de obstáculos", "yoga","pilates", "bádminton", "ping-pong", "handbol", "snowboard", "squash", "remo","vela", "motociclismo", "escalada", "squash", "gimnasia", "padel", "aeróbic", "kárate", "taichí", "lucha libre", "vóley playa", "patinaje artístico", "bobsleigh","biatlón", "biatlón", "motocross", "hípica", "luge", "polo", "taekwondo"
-    ];
-    var alimentos =["manzana", "pera","sandia","limón","naranja","uva","banana","papaya","lima","tamarindo","mandarina",
-"mango","guayaba","mora","frutilla","cereza","frambuesa","zarzamora","mburucuyá","piña","melón",
-"ciruela","coco","durazno","melocotón","toronja","pomelo","higo","membrillo","arándano","albaricoque",
-"carambola","chirimoya","dátil","kiwi","litchi","mamón","kaki","nectarina","níspero","granada","ganadida",
-"grosella","pitaya","anacardo","rambután","guayaba","nuez","castaña","uva pasa","avellana","cacao","pasas",
-"pistache","maní","cacahuate","aguacate","tomate","pimiento","remolacha","pepino","calabaza","calabacín",
-"judías","jalapeño","pimentón","rocoto","jitomate","berenjena","acelga","ajo","albahaca","alcachofa",
-"alubias","anís","apio","azafrán","batata","berenjena","berro","boniato","brócoli","canela","cardo",
-"cayena","cebolla","cebolla de verdeo","chirivía","cilantro","col","col de bruselas","espárrago",
-"espinaca","frijol","garbanzo","guisante","haba","hinojo","jalapeño","jenjibre","judías","kale",
-"lechuga","lenteja","mandioca","maíz","manzanilla","nabo","ñame","orégano","papa","perejil","puerro",
-"rábano","remolacha","repollo","romero","rúcula","zanahoria","queso","queso azul","queso camembert",
-"queso cheddar","queso mozzarela","queso de cabra","cereal con leche","budín de pan","arepas",
-"empanadas","feijoada","tacos al pastor","ceviche","tamales","milanesa","marinera","pozole","horchata",
-"asado","choripán","canelones","mandi'o chyryry","quesadilla","churrasco","dulce de leche","guacamole",
-"pizza","paella","hamburguesa","kebab","sopa paraguaya","chipa guasu","chipa","mbeju","tortilla paraguaya",
-"pastel mandi’o","caldo de gallina casero","pira caldo","bori bori","puchero locro","kumanda peky","butifarra",
-"dulce de mamón","pasta","fideo espiral","fideo moñito","macarrones","spaghetti","sopa de letras","lasagna",
-"ravioli","capellini","albóndigas","gnocci","sushi","ramen","onigiri","sashimi","sopa de miso","udon",
-"soba","bento","mochi","takoyaki","taiyaki","dango","tamagoyaki","edamane","gambas","almejas","mejillones",
-"champiñones","cangrejo","café","café expresso","café americano","café latte","frappé","café moca","jugo de fruta",
-"mate","tereré","té","té negro","té verde","chocolatada","milkshake","té de manzanilla","té helado","leche",
-"leche sin pasteurizar","yogurt","bebida láctea","leche de coco","leche de almendra","leche de soja",
-"batido de proteínas","kombucha","malta","cebada","cerveza","vino","vino tinto","vino blanco","champagne","sidra",
-"sangría","mojito","piña colada","margarita","tequila","ron","vodka","whiskhy","sake","ponche","mate cocido",
-"churros","tiramisu","gelatina","brigadeiros","alfajores","torta tres leches","cheesecake","pie de manzana","pie de limón",
-"macaron","profiteroles","donas","brownies","galletitas","galletas con chips de chocolate","galletita cementerio",
-"frutilla con chantillí","gelato","caramelitos de miel","caramelitos de menta","caramelos","mermelada","arroz con",
-"torta de zanahoria","torta de chocolate","torta de red velvet","torta de vainilla","torta de naranja","torta marmolada",
-"croissant","creme brule","souflé","mousse","ensalada de frutas","panettone","bizcocho","turrón","boquerón","pionono",
-"natilla","pudín","dedos de novia","paletas de helado","heladito en bolsa","helado","arroz","arroz con pollo","soyo",
-"avena","papas fritas","sandwich","sandwich de milanesa","sandwich de verduras","sandwich de jamón y queso","jamón",
-"pan","pan árabe","pan integral","pan de muerto","baguette","pan felipe","coquito","pan galleta","snickers","twix","kitkat",
-"m&m","bubbaloo","halls","gomitas","chicle"
-];
-    var objetos=["silla", "mesa", "cama", "sofá", "armario", "televisor", "computadora", "lámpara",
-"estufa", "refrigerador", "escritorio", "silla de oficina", "alfombra", "espejo", "ventana",
-"puerta", "estante", "cómoda", "mueble", "libro", "cuadro", "almohada", "colcha", "mesa de noche",
-"ventilador", "radio", "teléfono", "candelabro", "microondas", "tostadora", "cafetera",
-"plancha", "secadora", "máquina de coser", "calentador", "cercado", "juguete", "caja",
-"sombrero", "relojes", "teléfono móvil", "móvil", "mochila", "bicicleta", "impresora",
-"sábana", "toalla", "jarrón"
-];
-    var pokemon = [ "Pikachu", "Charmander", "Bulbasaur", "Squirtle", "Jigglypuff", "Meowth", "Eevee",
-"Snorlax", "Mewtwo", "Gengar", "Charizard", "Bulbasaur", "Squirtle", "Pidgey", "Rattata",
-"Jigglypuff", "Zubat", "Diglett", "Meowth", "Psyduck", "Machop", "Magnemite", "Farfetch'd",
-"Drowzee", "Krabby", "Exeggcute", "Deevolution", "Poliwhirl", "Machoke", "Tentacruel", "Geodude",
-"Ponyta", "Slowpoke", "Magnemite", "Grimer", "Dugtrio", "Onix", "Tangela", "Kangaskhan",
-"Horsea", "Goldeen", "Staryu", "Mr. Mime", "Scyther", "Jynx", "Electabuzz", "Magmar",
-"Pinsir", "Tauros", "Magikarp", "Gyarados", "Lapras", "Ditto", "Eevee", "Vaporeon",
-"Jolteon", "Flareon", "Porygon", "Omanyte", "Kabuto", "Aerodactyl", "Snorlax", "Articuno",
-"Zapdos", "Moltres", "Dratini", "Dragonair", "Dragonite", "Mewtwo", "Mew"
-];
-    var animales = ["león", "tigre", "elefante", "jirafa", "hipopótamo", "rino", "cebra", "panda", "koala",
-"canguro", "oso", "lobo", "zorro", "lince", "ciervo", "tortuga", "delfín", "ballena",
-"tiburón", "pingüino", "pelícano", "águila", "halcón", "búho", "cerca", "rata", "ratón",
-"conejo", "marmota", "ardilla", "gato", "perro", "caballo", "oveja", "vaca", "cerdo", "gallina",
-"pato", "pavo", "ganso", "cisne", "cabra", "camello", "burro", "yegua", "puma", "zorrillo",
-"nutria", "morsa", "tapir", "murciélago", "gacela", "mono", "chimpancé", "orangután",
-"jirafa", "ibis", "cangrejo", "medusa", "estrella de mar", "gallina", "dromedario"];
-    var videojuegos = [ "Super Mario", "The Legend of Zelda", "Minecraft", "Fortnite", "Pokémon", "Overwatch",
-"League of Legends", "Call of Duty", "World of Warcraft", "Tetris", "The Elder Scrolls",
-"Animal Crossing", "Apex Legends", "Grand Theft Auto", "Final Fantasy", "PUBG", "Assassin's Creed",
-"Halo", "God of War", "Red Dead Redemption", "Counter-Strike", "StarCraft", "FIFA", "Madden NFL",
-"Need for Speed", "The Sims", "Hearthstone", "Splatoon", "Rocket League", "Celeste", "Undertale",
-"Overcooked", "Hollow Knight", "Sekiro", "Dark Souls", "Bloodborne", "Monster Hunter", "Persona",
-"Dragon Age", "Mass Effect", "Bioshock", "Left 4 Dead", "XCOM", "Stardew Valley", "Cuphead",
-"Dead Cells", "Disco Elysium", "Doom", "Metro Exodus", "Shadow of the Tomb Raider", "Far Cry",
-"Mortal Kombat", "Tekken", "Street Fighter", "The Witcher", "Final Fantasy", "Resident Evil"
-];
-    var paises = [
-            { nombre: "Afganistán", codigo: "af" }, { nombre: "Albania", codigo: "al" }, 
-            { nombre: "Alemania", codigo: "de" }, { nombre: "Andorra", codigo: "ad" }, 
-            { nombre: "Angola", codigo: "ao" }, { nombre: "Antigua y Barbuda", codigo: "ag" }, 
-            { nombre: "Arabia Saudita", codigo: "sa" }, { nombre: "Argelia", codigo: "dz" }, 
-            { nombre: "Argentina", codigo: "ar" }, { nombre: "Armenia", codigo: "am" }, 
-            { nombre: "Australia", codigo: "au" }, { nombre: "Austria", codigo: "at" }, 
-            { nombre: "Azerbaiyán", codigo: "az" }, { nombre: "Bahamas", codigo: "bs" }, 
-            { nombre: "Bangladés", codigo: "bd" }, { nombre: "Barbados", codigo: "bb" }, 
-            { nombre: "Baréin", codigo: "bh" }, { nombre: "Bélgica", codigo: "be" }, 
-            { nombre: "Belice", codigo: "bz" }, { nombre: "Benín", codigo: "bj" }, 
-            { nombre: "Bielorrusia", codigo: "by" }, { nombre: "Birmania", codigo: "mm" }, 
-            { nombre: "Bolivia", codigo: "bo" }, { nombre: "Bosnia y Herzegovina", codigo: "ba" }, 
-            { nombre: "Botsuana", codigo: "bw" }, { nombre: "Brasil", codigo: "br" }, 
-            { nombre: "Brunéi", codigo: "bn" }, { nombre: "Bulgaria", codigo: "bg" }, 
-            { nombre: "Burkina Faso", codigo: "bf" }, { nombre: "Burundi", codigo: "bi" }, 
-            { nombre: "Bután", codigo: "bt" }, { nombre: "Cabo Verde", codigo: "cv" }, 
-            { nombre: "Camboya", codigo: "kh" }, { nombre: "Camerún", codigo: "cm" }, 
-            { nombre: "Canadá", codigo: "ca" }, { nombre: "Catar", codigo: "qa" }, 
-            { nombre: "Chad", codigo: "td" }, { nombre: "Chile", codigo: "cl" }, 
-            { nombre: "China", codigo: "cn" }, { nombre: "Chipre", codigo: "cy" }, 
-            { nombre: "Ciudad del Vaticano", codigo: "va" }, { nombre: "Colombia", codigo: "co" }, 
-            { nombre: "Comoras", codigo: "km" }, { nombre: "Corea del Norte", codigo: "kp" }, 
-            { nombre: "Corea del Sur", codigo: "kr" }, { nombre: "Costa de Marfil", codigo: "ci" }, 
-            { nombre: "Costa Rica", codigo: "cr" }, { nombre: "Croacia", codigo: "hr" }, 
-            { nombre: "Cuba", codigo: "cu" }, { nombre: "Dinamarca", codigo: "dk" }, 
-            { nombre: "Dominica", codigo: "dm" }, { nombre: "Ecuador", codigo: "ec" }, 
-            { nombre: "Egipto", codigo: "eg" }, { nombre: "El Salvador", codigo: "sv" }, 
-            { nombre: "Emiratos Árabes Unidos", codigo: "ae" }, { nombre: "Eritrea", codigo: "er" }, 
-            { nombre: "Eslovaquia", codigo: "sk" }, { nombre: "Eslovenia", codigo: "si" }, 
-            { nombre: "España", codigo: "es" }, { nombre: "Estados Unidos", codigo: "us" }, 
-            { nombre: "Estonia", codigo: "ee" }, { nombre: "Esuatini", codigo: "sz" }, 
-            { nombre: "Etiopía", codigo: "et" }, { nombre: "Filipinas", codigo: "ph" }, 
-            { nombre: "Finlandia", codigo: "fi" }, { nombre: "Fiyi", codigo: "fj" }, 
-            { nombre: "Francia", codigo: "fr" }, { nombre: "Gabón", codigo: "ga" }, 
-            { nombre: "Gambia", codigo: "gm" }, { nombre: "Georgia", codigo: "ge" }, 
-            { nombre: "Ghana", codigo: "gh" }, { nombre: "Granada", codigo: "gd" }, 
-            { nombre: "Grecia", codigo: "gr" }, { nombre: "Guatemala", codigo: "gt" }, 
-            { nombre: "Guinea", codigo: "gn" }, { nombre: "Guinea-Bisáu", codigo: "gw" }, 
-            { nombre: "Guinea Ecuatorial", codigo: "gq" }, { nombre: "Guyana", codigo: "gy" }, 
-            { nombre: "Haití", codigo: "ht" }, { nombre: "Honduras", codigo: "hn" }, 
-            { nombre: "Hungría", codigo: "hu" }, { nombre: "India", codigo: "in" }, 
-            { nombre: "Indonesia", codigo: "id" }, { nombre: "Irak", codigo: "iq" }, 
-            { nombre: "Irán", codigo: "ir" }, { nombre: "Irlanda", codigo: "ie" }, 
-            { nombre: "Islandia", codigo: "is" }, { nombre: "Islas Marshall", codigo: "mh" }, 
-            { nombre: "Islas Salomón", codigo: "sb" }, { nombre: "Israel", codigo: "il" }, 
-            { nombre: "Italia", codigo: "it" }, { nombre: "Jamaica", codigo: "jm" }, 
-            { nombre: "Japón", codigo: "jp" }, { nombre: "Jordania", codigo: "jo" }, 
-            { nombre: "Kazajistán", codigo: "kz" }, { nombre: "Kenia", codigo: "ke" }, 
-            { nombre: "Kirguistán", codigo: "kg" }, { nombre: "Kiribati", codigo: "ki" }, 
-            { nombre: "Kuwait", codigo: "kw" }, { nombre: "Laos", codigo: "la" }, 
-            { nombre: "Lesoto", codigo: "ls" }, { nombre: "Letonia", codigo: "lv" }, 
-            { nombre: "Líbano", codigo: "lb" }, { nombre: "Liberia", codigo: "lr" }, 
-            { nombre: "Libia", codigo: "ly" }, { nombre: "Liechtenstein", codigo: "li" }, 
-            { nombre: "Lituania", codigo: "lt" }, { nombre: "Luxemburgo", codigo: "lu" }, 
-            { nombre: "Madagascar", codigo: "mg" }, { nombre: "Malasia", codigo: "my" }, 
-            { nombre: "Malaui", codigo: "mw" }, { nombre: "Maldivas", codigo: "mv" }, 
-            { nombre: "Malí", codigo: "ml" }, { nombre: "Malta", codigo: "mt" }, 
-            { nombre: "Marruecos", codigo: "ma" }, { nombre: "Mauricio", codigo: "mu" }, 
-            { nombre: "Mauritania", codigo: "mr" }, { nombre: "México", codigo: "mx" }, 
-            { nombre: "Micronesia", codigo: "fm" }, { nombre: "Moldavia", codigo: "md" }, 
-            { nombre: "Mónaco", codigo: "mc" }, { nombre: "Mongolia", codigo: "mn" }, 
-            { nombre: "Montenegro", codigo: "me" }, { nombre: "Mozambique", codigo: "mz" }, 
-            { nombre: "Namibia", codigo: "na" }, { nombre: "Nauru", codigo: "nr" }, 
-            { nombre: "Nepal", codigo: "np" }, { nombre: "Nicaragua", codigo: "ni" }, 
-            { nombre: "Níger", codigo: "ne" }, { nombre: "Nigeria", codigo: "ng" }, 
-            { nombre: "Noruega", codigo: "no" }, { nombre: "Nueva Zelanda", codigo: "nz" }, 
-            { nombre: "Omán", codigo: "om" }, { nombre: "Países Bajos", codigo: "nl" }, 
-            { nombre: "Pakistán", codigo: "pk" }, { nombre: "Palaos", codigo: "pw" }, 
-            { nombre: "Panamá", codigo: "pa" }, { nombre: "Papúa Nueva Guinea", codigo: "pg" }, 
-            { nombre: "Paraguay", codigo: "py" }, { nombre: "Perú", codigo: "pe" }, 
-            { nombre: "Polonia", codigo: "pl" }, { nombre: "Portugal", codigo: "pt" }, 
-            { nombre: "Reino Unido", codigo: "gb" }, { nombre: "República Centroafricana", codigo: "cf" }, 
-            { nombre: "República Checa", codigo: "cz" }, { nombre: "República del Congo", codigo: "cg" }, 
-            { nombre: "República Democrática del Congo", codigo: "cd" }, { nombre: "República Dominicana", codigo: "do" }, 
-            { nombre: "Ruanda", codigo: "rw" }, { nombre: "Rumanía", codigo: "ro" }, 
-            { nombre: "Rusia", codigo: "ru" }, { nombre: "Samoa", codigo: "ws" }, 
-            { nombre: "San Cristóbal y Nieves", codigo: "kn" }, { nombre: "San Marino", codigo: "sm" }, 
-            { nombre: "San Vicente y las Granadinas", codigo: "vc" }, { nombre: "Santa Lucía", codigo: "lc" }, 
-            { nombre: "Santo Tomé y Príncipe", codigo: "st" }, { nombre: "Senegal", codigo: "sn" }, 
-            { nombre: "Serbia", codigo: "rs" }, { nombre: "Seychelles", codigo: "sc" }, 
-            { nombre: "Sierra Leona", codigo: "sl" }, { nombre: "Singapur", codigo: "sg" }, 
-            { nombre: "Siria", codigo: "sy" }, { nombre: "Somalia", codigo: "so" }, 
-            { nombre: "Sri Lanka", codigo: "lk" }, { nombre: "Sudáfrica", codigo: "za" }, 
-            { nombre: "Sudán", codigo: "sd" }, { nombre: "Sudán del Sur", codigo: "ss" }, 
-            { nombre: "Suecia", codigo: "se" }, { nombre: "Suiza", codigo: "ch" }, 
-            { nombre: "Surinam", codigo: "sr" }, { nombre: "Tailandia", codigo: "th" }, 
-            { nombre: "Tanzania", codigo: "tz" }, { nombre: "Tayikistán", codigo: "tj" }, 
-            { nombre: "Timor Oriental", codigo: "tl" }, { nombre: "Togo", codigo: "tg" }, 
-            { nombre: "Tonga", codigo: "to" }, { nombre: "Trinidad y Tobago", codigo: "tt" }, 
-            { nombre: "Túnez", codigo: "tn" }, { nombre: "Turkmenistán", codigo: "tm" }, 
-            { nombre: "Turquía", codigo: "tr" }, { nombre: "Tuvalu", codigo: "tv" }, 
-            { nombre: "Ucrania", codigo: "ua" }, { nombre: "Uganda", codigo: "ug" }, 
-            { nombre: "Uruguay", codigo: "uy" }, { nombre: "Uzbekistán", codigo: "uz" }, 
-            { nombre: "Vanuatu", codigo: "vu" }, { nombre: "Venezuela", codigo: "ve" }, 
-            { nombre: "Vietnam", codigo: "vn" }, { nombre: "Yemen", codigo: "ye" }, 
-            { nombre: "Yibuti", codigo: "dj" }, { nombre: "Zambia", codigo: "zm" }, 
-            { nombre: "Zimbabue", codigo: "zw" }
-        ];
-
-        
-    var peliculas= ["El Padrino", "La Lista de Schindler", "Forrest Gump", "Titanic", "Avatar", "Inception",
-"El Señor de los Anillos", "Pulp Fiction", "The Dark Knight", "Fight Club", "Star Wars",
-"Jurassic Park", "Matrix", "Gladiator", "El Rey León", "Harry Potter", "Casablanca",
-"La La Land", "E.T.", "Back to the Future", "The Shawshank Redemption", "Goodfellas",
-"Interstellar", "Joker", "Parasite", "The Departed", "Braveheart", "The Godfather II",
-"The Silence of the Lambs", "Schindler's List", "The Usual Suspects", "The Prestige",
-"The Green Mile", "The Truman Show", "Saving Private Ryan", "The Revenant", "Memento",
-"The Intouchables", "Gladiator", "Once Upon a Time in Hollywood", "Psycho", "2001: A Space Odyssey",
-"Spirited Away", "A Beautiful Mind", "The Sixth Sense", "Léon: The Professional", "The Grand Budapest Hotel",
-"Fargo", "The Shape of Water", "The Big Lebowski", "Her", "Whiplash"
-];
-    var superheroes = ["Superman","Batman","Iron Man","Spider-Man","Mujer Maravilla","Thor","Hulk","Capitan America",
-"Aquaman","Linterna Verde","The Flash","Viuda Negra","Ojo de Halcon","Pantera Negra","Doctor Strange",
-"Capitana Marvel","Wolverine","Deadpool","Cyborg","Shazam","Ant-Man","Vision","Bruja Escarlata",
-"Falcon","Star-Lord","Groot","Rocket Raccoon","Daredevil","Luke Cage","Jessica Jones","Punisher",
-"Linterna ","Detective Marciano","Bestia","Nightcrawler","Jean Grey","Tormenta","Titania","Gambito",
-"Silver Surfer","Ghost Rider","Quicksilver","Hawkgirl","Supergirl","Batgirl","Catwoman","Robin",
-"Soldado del invierno","Doctor Doom","Lex Luthor"
-];
-    var colores = ["rojo", "azul", "verde", "amarillo", "negro", "blanco", "morado", "rosa", "naranja",
-"gris", "café", "turquesa", "beige", "aqua", "coral", "lavanda", "marrón", "oliva", "cián",
-"magenta", "salmon", "marfil", "cian", "lila", "mostaza", "azul marino", "verde esmeralda",
-"verde oliva", "rosa pálido", "rojo vino", "púrpura", "verde agua", "amarillo mostaza", 
-"verde claro", "gris claro", "gris oscuro", "celeste", "verde menta", "azul celeste", 
-"amarillo pálido", "rojo oscuro", "azul eléctrico", "verde pasto", "morado claro", "rojo brillante",
-"rosa fucsia", "amarillo dorado", "azul petróleo", "gris plateado", "marfil", "lila claro", 
-"azul zafiro", "café oscuro"
-];
-var animes = [
-    "Naruto", "One Piece", "Dragon Ball Z", "Attack on Titan", "My Hero Academia", "Fullmetal Alchemist",
-    "Sword Art Online", "Demon Slayer", "Death Note", "Tokyo Ghoul", "Hunter x Hunter", "Bleach",
-    "JoJo's Bizarre Adventure", "Fairy Tail", "Black Clover", "Jujutsu Kaisen", "Re:Zero",
-    "Neon Genesis Evangelion", "One Punch Man", "Mob Psycho 100", "Cowboy Bebop", "Trigun",
-    "Gurren Lagann", "Akame ga Kill!", "No Game No Life", "Steins;Gate", "Blue Exorcist",
-    "Elfen Lied", "Violet Evergarden", "The Rising of the Shield Hero", "Your Lie in April",
-    "Sword of the Stranger", "Inuyasha", "K-On!", "The Seven Deadly Sins", "Rurouni Kenshin",
-    "Fate/Stay Night", "Clannad", "Anohana", "Toradora!", "Yuri on Ice", "Haikyuu!!",
-    "Kuroko no Basket", "Death Parade", "Beastars", "Great Teacher Onizuka", "Paranoia Agent",
-    "Berserk", "Psycho-Pass", "Hellsing", "Tokyo Revengers", "Zankyou no Terror"
-];
-
-
-
-
-        function seleccionarModo() {
-            modoJuego = document.getElementById("modo").value;
-        }
-
-        function agregarParticipante() {
-            var nombre = document.getElementById("nombre").value;
-            if (nombre !== "") {
-                participantes.push(nombre);
-                document.getElementById("nombre").value = "";
-                actualizarParticipantes();
-            }
-        }
-
-        function eliminarParticipante(index) {
-            var elemento = document.querySelector(`#participant-${index}`);
-            elemento.classList.add("remove");
-            setTimeout(function() {
-                participantes.splice(index, 1);
-                actualizarParticipantes();
-            }, 500); 
-        }
-
-        function actualizarParticipantes() {
-            var listaParticipantes = document.getElementById("listaParticipantes");
-            listaParticipantes.innerHTML = "";
-            participantes.forEach(function(nombre, index) {
-                listaParticipantes.innerHTML += 
-                    `<div class="participant" id="participant-${index}" onclick="eliminarParticipante(${index})">${nombre}</div>`;
-            });
-        }
-function mostrarPaisesConBanderas() {
-            var countryList = document.getElementById('countryList');
-            paises.forEach(function(pais) {
-                var countryItem = document.createElement('div');
-                countryItem.classList.add('country-item');
-
-               
-                var flagIcon = document.createElement('span');
-                flagIcon.classList.add('flag-icon', 'flag-icon-' + pais.codigo, 'flag');
-
-                
-                var countryName = document.createElement('span');
-                countryName.textContent = pais.nombre;
-
-               
-                countryItem.appendChild(flagIcon);
-                countryItem.appendChild(countryName);
-                countryList.appendChild(countryItem);
-            });
-        }
-
-        mostrarPaisesConBanderas();
-        
-        var palabra = "";
-        var palabraRequete = "";
-        var azar = 0;
-        var turno = 0;
-        var modoJuego = "re_perdido";
-        
-        function iniciarJuego() {
-            if (participantes.length > 0) {
-                azar = Math.floor(Math.random() * participantes.length);
-                turno = 0;
-                document.getElementById("verPalabra").disabled = false;
-                document.getElementById("pasarTurno").disabled = true;
-                document.getElementById("finalizarJuego").disabled = true;
-                mostrarTurno();
-            } else {
-                Swal.fire('Error', 'Debe haber al menos un participante.', 'error');
-            }
-            if (confirm("Estas seguro que quieres iniciar el juego?")) {
-                
-                var categoria = document.getElementById("categoria").value;
-
-                if (categoria == "deportes") {
-                    palabras = deportes;
-                } else if (categoria == "alimentos") {
-                    palabras = alimentos;
-                } else if (categoria == "objetos") {
-                    palabras = objetos;
-                } else if (categoria == "pokemon") {
-                    palabras = pokemon;
-                } else if (categoria == "animales") {
-                    palabras = animales;
-                } else if (categoria == "videojuegos") {
-                    palabras = videojuegos;
-                } else if (categoria == "paises") {
-                    palabras = paises;
-                } else if (categoria == "peliculas") {
-                    palabras = peliculas;
-                } else if (categoria == "superheroes") {
-                    palabras = superheroes;
-                } else if (categoria == "colores") {
-                    palabras = colores;
-                } else if (categoria == "animes") {
-                    palabras = animes;
-                } else if (categoria == "otros jugadores") {
-                palabras = participantes;
-                } else if (categoria == "random") {
-                    palabras = deportes.concat(alimentos, objetos, participantes, pokemon, animales, videojuegos, paises, peliculas, colores, animes);
-                }
-
-                palabra = palabras[Math.floor(Math.random() * palabras.length)];
-                palabraRequete = palabras[Math.floor(Math.random() * palabras.length)];
-                azar = Math.floor(Math.random() * participantes.length);
-                turno = 0;
-                document.getElementById("verPalabra").disabled = false;
-                document.getElementById("pasarTurno").disabled = true;
-                document.getElementById("finalizarJuego").disabled = true;
-                mostrarPalabra();
-            }
-        }
-
-        function mostrarTurno() {
-            if (turno < participantes.length) {
-                document.getElementById("turno").innerHTML = "Turno de " + participantes[turno];
-                document.getElementById("palabra").innerHTML = "";
-                document.getElementById("verPalabra").disabled = false;
-                document.getElementById("pasarTurno").disabled = true;
-            } else {
-                document.getElementById("turno").innerHTML = "Es hora de las preguntas!";
-                document.getElementById("palabra").innerHTML = "";
-                document.getElementById("verPalabra").disabled = true;
-                document.getElementById("pasarTurno").disabled = true;
-                document.getElementById("finalizarJuego").disabled = false;
-            }
-        }
-        function mostrarPalabra() {
-            if (turno < participantes.length) {
-                document.getElementById("turno").innerHTML = "Turno de " + participantes[turno] + ". Presiona 'Ver Palabra' para ver la palabra.";
-                document.getElementById("palabra").innerHTML = "";
-                document.getElementById("verPalabra").disabled = false;
-                document.getElementById("pasarTurno").disabled = true;
-            } else {
-                document.getElementById("turno").innerHTML = "Es hora de las preguntas!";
-                document.getElementById("palabra").innerHTML = "";
-                document.getElementById("verPalabra").disabled = true;
-                document.getElementById("pasarTurno").disabled = true;
-                document.getElementById("finalizarJuego").disabled = false;
-            }
-        }
-        function verPalabra() {
-    if (turno < participantes.length) {
-        var palabraContainer = document.getElementById("palabra");
-        palabraContainer.innerHTML = ""; 
-
-        if (turno === azar) {
-            if (modoJuego === "re_perdido") {
-                document.getElementById("palabra").innerHTML = "¡Estas re perdido, " + participantes[turno] + "!";
-            } else if (modoJuego === "requete_perdido") {
-                
-                if (typeof palabraRequete === 'object') {
-                    var flagIcon = document.createElement('span');
-                    flagIcon.classList.add('flag-icon', 'flag-icon-' + palabraRequete.codigo, 'flag');
-
-                    var countryName = document.createElement('span');
-                    countryName.textContent = palabraRequete.nombre;
-
-            
-                    palabraContainer.appendChild(flagIcon);
-                    palabraContainer.appendChild(countryName);
-                } else {
-            
-                    document.getElementById("palabra").innerHTML = participantes[turno] + ", la palabra es: " + palabraRequete;
-                }
-            }
-        } else {
-            if (typeof palabra === 'object') {
-
-                var flagIcon = document.createElement('span');
-                flagIcon.classList.add('flag-icon', 'flag-icon-' + palabra.codigo, 'flag');
-
-                var countryName = document.createElement('span');
-                countryName.textContent = palabra.nombre;
-
-                palabraContainer.appendChild(flagIcon);
-                palabraContainer.appendChild(countryName);
-            } else {
-                document.getElementById("palabra").innerHTML = participantes[turno] + ", la palabra es: " + palabra;
-            }
-        }
-
-        document.getElementById("verPalabra").disabled = true;
-        document.getElementById("pasarTurno").disabled = false;
-    }
-}
-
-
-        function pasarTurno() {
-            turno++;
-            mostrarTurno();
-        }
-
-        function finalizarJuego() {
-            var opciones = [];
-            while (opciones.length < 3) {
-                var opcion = palabras[Math.floor(Math.random() * palabras.length)];
-                if (opcion != palabra && !opciones.includes(opcion)) {
-                    opciones.push(opcion);
-                }
-            }
-            opciones.push(palabra);
-            opciones.sort(function() { return 0.5 - Math.random() });
-            var seleccion = prompt("Cual crees que era la palabra secreta?\n1. " + opciones[0] + "\n2. " + opciones[1] + "\n3. " + opciones[2] + "\n4. " + opciones[3]);
-            if (opciones[seleccion - 1] == palabra) {
-                alert("Felicidades! Has adivinado la palabra correcta.");
-            } else {
-                alert("Lo siento, esa no era la palabra correcta.");
-            }
-            document.getElementById("turno").innerHTML = "La palabra era: " + palabra;
-            document.getElementById("palabra").innerHTML = "";
-        }
-
-        function reiniciarJuego() {
-            if (confirm("Estas segur@ que quieres reiniciar el juego?")) {
-                participantes = [];
-                palabras = [];
-                palabra = "";
-                azar = 0;
-                turno = 0;
-                document.getElementById("participantes").innerHTML = "";
-                document.getElementById("turno").innerHTML = "";
-                document.getElementById("palabra").innerHTML = "";
-                document.getElementById("verPalabra").disabled = true;
-                document.getElementById("pasarTurno").disabled = true;
-                document.getElementById("finalizarJuego").disabled = true;
-            }
-        }
-
-        function showPopup() {
-            Swal.fire({
-                title: "TUTORIAL",
-                text: "El juego comienza registrando los nombres de todos los participantes. El dispositivo va pasando de mano en mano cuando aparezca el nombre de cada jugador en la pantalla.A esa persona se le mostrara una palabra que debe describir sin decirla directamente... o tal vez no. Si no le muestran la palabra, esa persona esta 're perdida' y debera fingir que la conoce mientras intenta adivinarla. Una vez todos hayan visto su palabra, comienza la ronda de preguntas. Al final, todos votan por quien creen que es el verdadero 're perdido'.",
-                showCloseButton: true,
-            });
-        }
-
-        function openModal() {
-            document.getElementById("modal").style.display = "flex";
-        }
-
-        function closeModal() {
-            document.getElementById("modal").style.display = "none";
-        }
-
-        window.onclick = function(event) {
-            var modal = document.getElementById("modal");
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
-    </script>
 </head>
 <body>
     <div class="container">
-        <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3o1MDRoM2h3dWV6b3ZxYTlobGxibng4czAxMHR0NnYzZzZnMXVwNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/FepRQChUMDpYt0lHlE/giphy.gif" alt="Título del juego" class="logo">
-        <button2 onclick="showPopup()">?</button2>
-        <label for="modo"></label>
-        <select id="modo" onchange="seleccionarModo()">
-            <option value="re_perdido">Re Perdido</option>
-            <option value="requete_perdido">Requete Perdido</option>
-        </select>
-        <select id="categoria">
-            <option value="deportes">Deportes</option>
-            <option value="alimentos">Alimentos</option>
-            <option value="objetos">Objetos</option>
-            <option value="pokemon">Pokemon</option>
-            <option value="animales">Animales</option>
-            <option value="videojuegos">Videojuegos</option>
-            <option value="paises">Paises</option>
-            <option value="peliculas">Peliculas</option>
-            <option value="superheroes">Superheroes</option>
-            <option value="colores">Colores</option>
-            <option value="animes">Animes</option>
-            <option value="otros jugadores">Otros jugadores</option>
-            <option value="random">Random</option>
-        </select>
-        <input type="text" id="nombre" placeholder="Nombre del participante">
-        <button class="blue-button"onclick="agregarParticipante()">Agregar participante</button>
-    
-        
+        <header class="header">
+            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3o1MDRoM2h3dWV6b3ZxYTlobGxibng4czAxMHR0NnYzZzZnMXVwNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/FepRQChUMDpYt0lHlE/giphy.gif" alt="Logo" class="logo">
+            <button onclick="showTutorial()">?</button>
+        </header>
 
-        <button onclick="openModal()">Ver participantes</button>
+        <div class="player-section">
+            <div class="controls">
+                <select id="gameMode">
+                    <option value="re_perdido">Re Perdido</option>
+                    <option value="requete_perdido">Requete Perdido</option>
+                </select>
+                <select id="category">
+                    <option value="deportes">Deportes</option>
+                    <option value="alimentos">Alimentos</option>
+                    <option value="peliculas">Películas</option>
+                    <option value="series">Series</option>
+                    <option value="anime">Anime</option>
+                    <option value="videojuegos">Videojuegos</option>
+                    <option value="superheroes">Superhéroes</option>
+                    <option value="paises">Países</option>
+                    <option value="ciudades">Ciudades</option>
+                    <option value="franquicias">Franquicias</option>
+                    <option value="objetos">Objetos Cotidianos</option>
+                    <option value="random">Aleatorio</option>
+                </select>
+            </div>
 
-        <button onclick="iniciarJuego()">Iniciar juego</button>
-        <button id="verPalabra" onclick="verPalabra()" disabled>Ver Palabra</button>
-        <button id="pasarTurno" onclick="pasarTurno()" disabled>Pasar Turno</button>
-        <button id="finalizarJuego" onclick="finalizarJuego()" disabled>Finalizar Juego</button>
-        <button onclick="reiniciarJuego()">Reiniciar Juego</button>
-        
-        <p id="turno"></p>
-        <p id="palabra"></p>
-    </div>
+            <div class="controls">
+                <input type="text" id="playerName" placeholder="Nombre del jugador">
+                <button onclick="addPlayer()">Añadir Jugador</button>
+            </div>
 
-
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Lista de Participantes</h2>
-            <div id="listaParticipantes"></div>
+            <div id="playerList"></div>
         </div>
+
+        <div class="controls">
+            <button onclick="startGame()" id="startBtn">Comenzar Juego</button>
+            <button onclick="showWord()" id="showWordBtn" disabled>Mostrar Palabra</button>
+            <button onclick="nextTurn()" id="nextTurnBtn" disabled>Siguiente Turno</button>
+            <button onclick="endGame()" id="endGameBtn" disabled>Finalizar Juego</button>
+            <button onclick="resetGame()" class="danger">Reiniciar</button>
+        </div>
+
+        <div id="turnDisplay"></div>
+        <div id="wordDisplay"></div>
     </div>
-</div>
-</div>
-</div>
 
-</body>
-</html>
+    <script>
+        // ===== GAME STATE =====
+        let players = [];
+        let currentTurn = 0;
+        let impostorIndex = -1;
+        let mainWord = '';
+        let altWord = '';
+        let gameStarted = false;
+        
+        // ===== CATEGORIES =====
+        const categories = {
+            deportes: [],
+            alimentos: [],
+            peliculas: [],
+            series: [],
+            anime: [],
+            videojuegos: [],
+            superheroes: [],
+            paises: [],
+            ciudades: [],
+            franquicias: [],
+            objetos: []
+        };
 
+        // ===== DATA LOADING =====
+        async function loadCategoryData(category) {
+            if (categories[category].length === 0) {
+                try {
+                    const response = await fetch(`data/${category}.json`);
+                    const data = await response.json();
+                    categories[category] = data;
+                } catch (error) {
+                    console.error(`Error loading ${category}:`, error);
+                    return [];
+                }
+            }
+            return categories[category];
+        }
 
+        // ===== PLAYER MANAGEMENT =====
+        function addPlayer() {
+            const nameInput = document.getElementById('playerName');
+            const name = nameInput.value.trim();
+            
+            if (name && !players.includes(name)) {
+                players.push(name);
+                nameInput.value = '';
+                updatePlayerList();
+            }
+        }
+
+        function updatePlayerList() {
+            const playerList = document.getElementById('playerList');
+            playerList.innerHTML = players.map((player, index) => `
+                <div class="player-item" data-index="${index}">
+                    ${player}
+                    <button class="remove-btn" onclick="removePlayer(${index})">×</button>
+                </div>
+            `).join('');
+            
+            Sortable.create(playerList, {
+                animation: 150,
+                onUpdate: (evt) => {
+                    const movedPlayer = players.splice(evt.oldIndex, 1)[0];
+                    players.splice(evt.newIndex, 0, movedPlayer);
+                    updatePlayerList();
+                }
+            });
+        }
+
+        function removePlayer(index) {
+            players.splice(index, 1);
+            updatePlayerList();
+        }
+
+        // ===== GAME LOGIC =====
+        async function startGame() {
+            if (players.length < 2) {
+                Swal.fire('Error', '¡Se necesitan al menos 2 jugadores!', 'error');
+                return;
+            }
+
+            const category = document.getElementById('category').value;
+            const words = await loadCategoryData(category);
+            
+            if (words.length < 2) {
+                Swal.fire('Error', 'No hay suficientes palabras en esta categoría', 'error');
+                return;
+            }
+
+            Swal.fire({
+                title: '¡Comenzamos!',
+                html: `Modo: ${document.getElementById('gameMode').value.toUpperCase()}<br>
+                       Jugadores: ${players.length}<br>
+                       Categoría: ${category}`,
+                confirmButtonText: '¡Empezar!'
+            }).then(() => {
+                gameStarted = true;
+                impostorIndex = Math.floor(Math.random() * players.length);
+                
+                // Ensure mainWord and altWord are different
+                mainWord = words[Math.floor(Math.random() * words.length)];
+                do {
+                    altWord = words[Math.floor(Math.random() * words.length)];
+                } while (altWord === mainWord);
+                
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('showWordBtn').disabled = false;
+                updateTurnDisplay();
+            });
+        }
+
+        function showWord() {
+            const currentPlayer = players[currentTurn];
+            let word = mainWord;
+            
+            if (currentTurn === impostorIndex) {
+                if (document.getElementById('gameMode').value === 're_perdido') {
+                    word = '¡Estás re perdido!';
+                } else {
+                    word = altWord;
+                }
+            }
+
+            const wordDisplay = document.getElementById('wordDisplay');
+            wordDisplay.style.opacity = 0;
+            wordDisplay.style.transform = 'scale(0.8)';
+            
+            setTimeout(() => {
+                wordDisplay.innerHTML = currentTurn === impostorIndex && 
+                    document.getElementById('gameMode').value === 're_perdido' 
+                    ? `<span class="impostor">${word}</span>`
+                    : word;
+                
+                wordDisplay.style.opacity = 1;
+                wordDisplay.style.transform = 'scale(1)';
+                document.getElementById('showWordBtn').disabled = true;
+                document.getElementById('nextTurnBtn').disabled = false;
+            }, 300);
+        }
+
+        function nextTurn() {
+            currentTurn++;
+            if (currentTurn >= players.length) {
+                startQuestionRound();
+                return;
+            }
+            
+            updateTurnDisplay();
+            document.getElementById('showWordBtn').disabled = false;
+            document.getElementById('nextTurnBtn').disabled = true;
+        }
+
+        function startQuestionRound() {
+            Swal.fire({
+                title: '¡Ronda de Preguntas!',
+                html: 'Discutan y descubran al impostor',
+                timer: 30000,
+                timerProgressBar: true
+            }).then(() => {
+                endGame();
+            });
+        }
+
+        function endGame() {
+            Swal.fire({
+                title: '¡Juego Terminado!',
+                html: `La palabra era: <strong>${mainWord}</strong><br>
+                       El impostor era: <strong>${players[impostorIndex]}</strong>`,
+                confirmButtonText: 'OK'
+            });
+            resetGameState();
+        }
+
+        function resetGame() {
+            if (confirm('¿Estás seguro de querer reiniciar?')) {
+                players = [];
+                resetGameState();
+                updatePlayerList();
+            }
+        }
+
+        function resetGameState() {
+            gameStarted = false;
+            currentTurn = 0;
+            impostorIndex = -1;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('showWordBtn').disabled = true;
+            document.getElementById('nextTurnBtn').disabled = true;
+            document.getElementById('endGameBtn').disabled = true;
+            document.getElementById('turnDisplay').textContent = '';
+            document.getElementById('wordDisplay').textContent = '';
+        }
+
+        // ===== UTILITIES =====
+        function updateTurnDisplay() {
+            document.getElementById('turnDisplay').textContent = 
+                `Turno de: ${players[currentTurn]}`;
+        }
+
+        function showTutorial() {
+            Swal.fire({
+                title: '¿Cómo Jugar?',
+                html: `<ol>
+                    <li>Añade al menos 2 jugadores</li>
+                    <li>Selecciona modo de juego y categoría</li>
+                    <li>Presiona "Comenzar Juego"</li>
+                    <li>Cada jugador verá su palabra cuando sea su turno</li>
+                    <li>¡El impostor debe engañar a los demás!</li>
+                    <li>Después de todos los turnos, discutan quién creen que es el impostor</li>
+                </ol>`,
+                confirmButtonText: 'Entendido'
+            });
+        }
+
+        // Initialize game
+        document.addEventListener('DOMContentLoaded', updatePlayerList);
+    </script>
 </body>
 </html>
