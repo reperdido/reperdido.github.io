@@ -280,19 +280,21 @@
         };
 
         // ===== DATA LOADING =====
-        async function loadCategoryData(category) {
-            if (categories[category].length === 0) {
-                try {
-                    const response = await fetch(`data/${category}.json`);
-                    const data = await response.json();
-                    categories[category] = data;
-                } catch (error) {
-                    console.error(`Error loading ${category}:`, error);
-                    return [];
-                }
-            }
-            return categories[category];
+       async function loadCategoryData(category) {
+    console.log(`Loading category: ${category}`); // Debugging
+    try {
+        const response = await fetch(`data/${category}.json`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        const data = await response.json();
+        console.log(`Data loaded for ${category}:`, data); // Debugging
+        return data;
+    } catch (error) {
+        console.error(`Error loading ${category}:`, error);
+        return [];
+    }
+}
 
         // ===== PLAYER MANAGEMENT =====
         function addPlayer() {
