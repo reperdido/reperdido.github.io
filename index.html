@@ -266,19 +266,18 @@
         
         // ===== CATEGORIES =====
         const categories = {
-            deportes: [],
-            alimentos: [],
-            peliculas: [],
-            series: [],
-            anime: [],
-            videojuegos: [],
-            superheroes: [],
-            paises: [],
-            ciudades: [],
-            franquicias: [],
-            objetos: []
-        };
-
+    deportes: ["fútbol", "baloncesto", "tenis", "natación"],
+    alimentos: ["manzana", "pera", "sandía", "limón"],
+    peliculas: ["El Padrino", "La Lista de Schindler", "Forrest Gump", "Titanic"],
+    series: ["Breaking Bad", "Game of Thrones", "Stranger Things", "The Office"],
+    anime: ["Naruto", "One Piece", "Dragon Ball Z", "Attack on Titan"],
+    videojuegos: ["Super Mario", "The Legend of Zelda", "Minecraft", "Fortnite"],
+    superheroes: ["Superman", "Batman", "Iron Man", "Spider-Man"],
+    paises: ["Argentina", "Brasil", "Chile", "Uruguay"],
+    ciudades: ["Buenos Aires", "Madrid", "París", "Londres"],
+    franquicias: ["Star Wars", "Marvel Cinematic Universe", "Harry Potter", "El Señor de los Anillos"],
+    objetos: ["silla", "mesa", "cama", "sofá"]
+};
         // ===== DATA LOADING =====
         async function loadCategoryData(category) {
             if (categories[category].length === 0) {
