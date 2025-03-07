@@ -209,7 +209,7 @@
 <body>
     <div class="container">
         <header class="header">
-            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExc3o1MDRoM2h3dWV6b3ZxYTlobGxibng4czAxMHR0NnYzZzZnMXVwNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/FepRQChUMDpYt0lHlE/giphy.gif" alt="Logo" class="logo">
+            <img src="https://media.tenor.com/xqiL0lOVMUYAAAAi/strawberry-crepe-cookie-cookie-run-kingdom.gif" alt="Logo" class="logo">
             <button onclick="showTutorial()">?</button>
         </header>
 
@@ -247,7 +247,10 @@
             <button onclick="showWord()" id="showWordBtn" disabled>Mostrar Palabra</button>
             <button onclick="nextTurn()" id="nextTurnBtn" disabled>Siguiente Turno</button>
             <button onclick="endGame()" id="endGameBtn" disabled>Finalizar Juego</button>
+            <!-- Botón existente que reinicia eliminando jugadores -->
             <button onclick="resetGame()" class="danger">Reiniciar</button>
+            <!-- Nuevo botón que reinicia la ronda sin eliminar jugadores -->
+            <button onclick="resetRound()" class="danger">Reiniciar Todo</button>
         </div>
 
         <div id="turnDisplay"></div>
@@ -265,17 +268,18 @@
         
         // ===== CATEGORIES =====
         const categories = {
-    deportes: [],
-    alimentos: [],
-    peliculas: [],
-    series: [],
-    anime: [],
-    videojuegos: [],
-    superheroes: [],
-    paises: [],
-    franquicias: [],
-    objetos: []
-};
+            deportes: [],
+            alimentos: [],
+            peliculas: [],
+            series: [],
+            anime: [],
+            videojuegos: [],
+            superheroes: [],
+            paises: [],
+            franquicias: [],
+            objetos: []
+        };
+
         // ===== DATA LOADING =====
         async function loadCategoryData(category) {
             if (categories[category].length === 0) {
@@ -352,7 +356,7 @@
                 gameStarted = true;
                 impostorIndex = Math.floor(Math.random() * players.length);
                 
-                // Ensure mainWord and altWord are different
+                // Asegurarse de que mainWord y altWord sean diferentes
                 mainWord = words[Math.floor(Math.random() * words.length)];
                 do {
                     altWord = words[Math.floor(Math.random() * words.length)];
@@ -364,28 +368,26 @@
             });
         }
 
+        // La función showWord muestra la palabra (o mensaje de impostor) con una animación de fade.
         function showWord() {
-            const currentPlayer = players[currentTurn];
-            let word = mainWord;
-            
-            if (currentTurn === impostorIndex) {
-                if (document.getElementById('gameMode').value === 're_perdido') {
-                    word = '¡Estás re perdido!';
-                } else {
-                    word = altWord;
-                }
-            }
-
             const wordDisplay = document.getElementById('wordDisplay');
+            // Animación de fade-out
             wordDisplay.style.opacity = 0;
             wordDisplay.style.transform = 'scale(0.8)';
             
             setTimeout(() => {
-                wordDisplay.innerHTML = currentTurn === impostorIndex && 
-                    document.getElementById('gameMode').value === 're_perdido' 
+                let word = mainWord;
+                if (currentTurn === impostorIndex) {
+                    if (document.getElementById('gameMode').value === 're_perdido') {
+                        word = '¡Estás re perdido!';
+                    } else {
+                        word = altWord;
+                    }
+                }
+                
+                wordDisplay.innerHTML = (currentTurn === impostorIndex && document.getElementById('gameMode').value === 're_perdido')
                     ? `<span class="impostor">${word}</span>`
                     : word;
-                
                 wordDisplay.style.opacity = 1;
                 wordDisplay.style.transform = 'scale(1)';
                 document.getElementById('showWordBtn').disabled = true;
@@ -393,7 +395,10 @@
             }, 300);
         }
 
+        // MODIFICADO: Al presionar "Siguiente Turno", se limpia inmediatamente la palabra mostrada.
         function nextTurn() {
+            // Se limpia la palabra para que el siguiente jugador no vea lo anterior.
+            document.getElementById('wordDisplay').textContent = '';
             currentTurn++;
             if (currentTurn >= players.length) {
                 startQuestionRound();
@@ -426,11 +431,42 @@
             resetGameState();
         }
 
+        // resetGame muestra una confirmación y reinicia el juego eliminando jugadores.
         function resetGame() {
-            if (confirm('¿Estás seguro de querer reiniciar?')) {
+            if (confirm('¿Estás seguro de querer reiniciar y eliminar todos los jugadores? Esta acción borrará la lista de jugadores y reiniciará el juego.')) {
                 players = [];
                 resetGameState();
                 updatePlayerList();
+                document.getElementById('startBtn').disabled = false;
+            }
+        }
+
+        // resetRound reinicia la ronda actual (barajea nuevas palabras y permite cambiar de categoría) sin eliminar los jugadores.
+        function resetRound() {
+            if (!gameStarted) return;
+            if (confirm('¿Estás seguro de reiniciar la ronda actual? Se barajará una nueva palabra y/o se podrá cambiar de categoría, pero los jugadores se mantendrán.')) {
+                const category = document.getElementById('category').value;
+                loadCategoryData(category).then(words => {
+                    if (words.length < 2) {
+                        Swal.fire('Error', 'No hay suficientes palabras en esta categoría', 'error');
+                        return;
+                    }
+                    impostorIndex = Math.floor(Math.random() * players.length);
+                    
+                    mainWord = words[Math.floor(Math.random() * words.length)];
+                    do {
+                        altWord = words[Math.floor(Math.random() * words.length)];
+                    } while (altWord === mainWord);
+                    
+                    // Reiniciar turno para el primer jugador de la ronda
+                    currentTurn = 0;
+                    updateTurnDisplay();
+                    
+                    // Limpiar la pantalla para que el siguiente jugador presione "Mostrar Palabra"
+                    document.getElementById('wordDisplay').textContent = "";
+                    document.getElementById('showWordBtn').disabled = false;
+                    document.getElementById('nextTurnBtn').disabled = true;
+                });
             }
         }
 
@@ -457,17 +493,18 @@
                 title: '¿Cómo Jugar?',
                 html: `<ol>
                     <li>Añade al menos 2 jugadores</li>
-                    <li>Selecciona modo de juego y categoría</li>
+                    <li>Selecciona el modo de juego y la categoría</li>
                     <li>Presiona "Comenzar Juego"</li>
                     <li>Cada jugador verá su palabra cuando sea su turno</li>
-                    <li>¡El impostor debe engañar a los demás!</li>
+                    <li>El impostor debe engañar a los demás</li>
+                    <li>Antes de pasar el teléfono, presiona "Siguiente Turno" para borrar la palabra del jugador anterior</li>
                     <li>Después de todos los turnos, discutan quién creen que es el impostor</li>
                 </ol>`,
                 confirmButtonText: 'Entendido'
             });
         }
 
-        // Initialize game
+        // Inicializar lista de jugadores al cargar la página.
         document.addEventListener('DOMContentLoaded', updatePlayerList);
     </script>
 </body>
