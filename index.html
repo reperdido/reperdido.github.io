@@ -1,511 +1,649 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Re Perdido! - El Juego</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <style>
-        /* ===== BASE STYLES ===== */
-        :root {
-            --primary: #1A1A2E;
-            --secondary: #16213E;
-            --accent: #E94560;
-            --text: #FFFFFF;
-            --success: #00B894;
-            --warning: #FDCB6E;
-            --danger: #D63031;
-        }
-
-        body {
-            font-family: 'Nunito', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--primary);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            max-width: 800px;
-            width: 100%;
-            background: var(--secondary);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        /* ===== HEADER ===== */
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .logo {
-            max-width: 150px;
-            margin-bottom: 1rem;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        /* ===== PLAYER MANAGEMENT ===== */
-        .player-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-        }
-
-        #playerList {
-            min-height: 120px;
-            margin: 1rem 0;
-        }
-
-        .player-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            margin: 0.5rem 0;
-            background: var(--accent);
-            border-radius: 10px;
-            cursor: move;
-            transition: all 0.3s ease;
-        }
-
-        .player-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .remove-btn {
-            background: var(--danger);
-            border: none;
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 50%;
-            cursor: pointer;
-            margin-left: 0.5rem;
-            font-size: 0.8em;
-        }
-
-        /* ===== GAME CONTROLS ===== */
-        .controls {
-            display: grid;
-            gap: 0.75rem;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            margin: 1.5rem 0;
-        }
-
-        button {
-            background: var(--accent);
-            border: none;
-            color: var(--text);
-            padding: 0.75rem;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        /* ===== GAME DISPLAY ===== */
-        #turnDisplay {
-            text-align: center;
-            font-size: 1.25rem;
-            margin: 1.5rem 0;
-            min-height: 40px;
-        }
-
-        #wordDisplay {
-            font-size: 1.75rem;
-            text-align: center;
-            padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            margin: 1.5rem 0;
-            transition: all 0.5s ease;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .impostor {
-            color: var(--warning);
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        /* ===== MODALS ===== */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: var(--secondary);
-            padding: 2rem;
-            border-radius: 20px;
-            max-width: 500px;
-            width: 90%;
-            position: relative;
-        }
-
-        /* ===== MOBILE OPTIMIZATION ===== */
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            
-            .container {
-                padding: 1rem;
-            }
-            
-            button {
-                font-size: 0.9rem;
-                padding: 0.6rem;
-            }
-            
-            #wordDisplay {
-                font-size: 1.5rem;
-                padding: 1rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>¡Re Perdido! - El Juego</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <style>
+    /* ===== BASE STYLES ===== */
+    :root {
+      --primary: #1A1A2E;
+      --secondary: #16213E;
+      --accent: #E94560;
+      --text: #FFFFFF;
+      --success: #00B894;
+      --warning: #FDCB6E;
+      --danger: #D63031;
+    }
+    body {
+      font-family: 'Nunito', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--primary);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      position: relative;
+      max-width: 900px;
+      width: 100%;
+      background: var(--secondary);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    /* ===== NAVEGACIÓN ===== */
+    .nav {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1rem;
+    }
+    .nav button {
+      font-size: 0.8rem;
+      padding: 0.4rem;
+    }
+    /* ===== BOTÓN DE AYUDA ===== */
+    #helpBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--accent);
+      border: none;
+      color: var(--text);
+      padding: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    /* ===== HEADER ===== */
+    .header {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .logo {
+      max-width: 150px;
+      margin-bottom: 1rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    /* ===== PÁGINAS ===== */
+    #configPage { display: block; }
+    #gamePage { display: none; }
+    /* ===== CONFIGURACIÓN ===== */
+    .input-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .input-row.horizontal {
+      flex-direction: row;
+      gap: 5px;
+    }
+    .input-row.horizontal input {
+      flex: 1;
+    }
+    #playerList { margin-bottom: 1rem; }
+    .player-item {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      margin: 0.5rem 0;
+      background: var(--accent);
+      border-radius: 10px;
+      cursor: move;
+      transition: all 0.3s ease;
+    }
+    .player-item.dragging {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+    .avatar {
+      margin-right: 0.5rem;
+      font-size: 1.5rem;
+    }
+    .remove-btn {
+      background: var(--danger);
+      border: none;
+      color: var(--text);
+      padding: 0.25rem 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      margin-left: auto;
+      font-size: 0.8em;
+    }
+    #minPlayersWarning {
+      text-align: center;
+      color: var(--danger);
+      display: none;
+    }
+    /* Dropdown styling para modo y categoría */
+    select {
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      padding: 0.75rem;
+      color: var(--text);
+      font-size: 1rem;
+      text-align: center;
+      display: block;
+      width: 80%;
+      margin: 0.5rem auto;
+    }
+    /* Botón de "Comenzar Juego" */
+    #startBtn {
+      background: var(--warning);
+      color: var(--secondary);
+      font-size: 1.2rem;
+      padding: 1rem;
+      border-radius: 15px;
+      display: block;
+      width: 60%;
+      margin: 1rem auto;
+    }
+    /* ===== PANTALLA DE JUEGO ===== */
+    #turnDisplay, #wordDisplay {
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+    #turnDisplay { font-size: 1.25rem; min-height: 40px; }
+    #wordDisplay {
+      font-size: 1.75rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .flip { transform: rotateY(180deg); }
+    /* Contenedor de botones en el panel de juego */
+    .game-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    button {
+      background: var(--accent);
+      border: none;
+      color: var(--text);
+      padding: 0.75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    /* Botones de reiniciar tienen margen extra */
+    .danger {
+      margin-top: 1rem;
+    }
+    /* ===== MOBILE ===== */
+    @media (max-width: 600px) {
+      .container { padding: 1rem; }
+      .nav button { font-size: 0.7rem; padding: 0.3rem; }
+      select { width: 90%; }
+      #startBtn { width: 80%; }
+      .game-controls { gap: 0.5rem; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <img src="https://media.tenor.com/xqiL0lOVMUYAAAAi/strawberry-crepe-cookie-cookie-run-kingdom.gif" alt="Logo" class="logo">
-            <button onclick="showTutorial()">?</button>
-        </header>
-
-        <div class="player-section">
-            <div class="controls">
-                <select id="gameMode">
-                    <option value="re_perdido">Re Perdido</option>
-                    <option value="requete_perdido">Requete Perdido</option>
-                </select>
-                <select id="category">
-                    <option value="deportes">Deportes</option>
-                    <option value="alimentos">Alimentos</option>
-                    <option value="peliculas">Películas</option>
-                    <option value="series">Series</option>
-                    <option value="anime">Anime</option>
-                    <option value="videojuegos">Videojuegos</option>
-                    <option value="superheroes">Superhéroes</option>
-                    <option value="paises">Países</option>
-                    <option value="franquicias">Franquicias</option>
-                    <option value="objetos">Objetos</option>
-                    <option value="random">Aleatorio</option>
-                </select>
-            </div>
-
-            <div class="controls">
-                <input type="text" id="playerName" placeholder="Nombre del jugador">
-                <button onclick="addPlayer()">Añadir Jugador</button>
-            </div>
-
-            <div id="playerList"></div>
-        </div>
-
-        <div class="controls">
-            <button onclick="startGame()" id="startBtn">Comenzar Juego</button>
-            <button onclick="showWord()" id="showWordBtn" disabled>Mostrar Palabra</button>
-            <button onclick="nextTurn()" id="nextTurnBtn" disabled>Siguiente Turno</button>
-            <button onclick="endGame()" id="endGameBtn" disabled>Finalizar Juego</button>
-            <!-- Botón existente que reinicia eliminando jugadores -->
-            <button onclick="resetGame()" class="danger">Reiniciar</button>
-            <!-- Nuevo botón que reinicia la ronda sin eliminar jugadores -->
-            <button onclick="resetRound()" class="danger">Reiniciar Todo</button>
-        </div>
-
-        <div id="turnDisplay"></div>
-        <div id="wordDisplay"></div>
+  <div class="container">
+    <button id="helpBtn" onclick="showTutorial()">?</button>
+    <div class="nav">
+      <button onclick="showConfigPage()">🛠️</button>
+      <button onclick="showGamePage()">🎮</button>
     </div>
+    <!-- PÁGINA DE CONFIGURACIÓN -->
+    <div id="configPage">
+      <div class="header">
+        <!-- Nuevo GIF de header -->
+        <img src="https://media.tenor.com/xqiL0lOVMUYAAAAi/strawberry-crepe-cookie-cookie-run-kingdom.gif" alt="Header" class="logo">
+      </div>
+      <div class="input-row horizontal">
+        <input type="text" id="playerName" placeholder="Nombre del jugador" />
+      </div>
+      <div class="input-row horizontal">
+        <button onclick="addPlayer()">Añadir Jugador</button>
+        <button onclick="randomizeOrder()">Randomizar</button>
+      </div>
+      <div id="playerList"></div>
+      <div id="minPlayersWarning">¡Se necesitan al menos 2 jugadores!</div>
+      <select id="gameMode" onchange="updateModeDescription()">
+        <option value="re_perdido">Re Perdido</option>
+        <option value="requete_perdido">Requete Perdido</option>
+      </select>
+      <select id="categorySelect">
+        <option value="deportes">Deportes</option>
+        <option value="alimentos">Alimentos</option>
+        <option value="peliculas">Películas</option>
+        <option value="series">Series</option>
+        <option value="anime">Anime</option>
+        <option value="videojuegos">Videojuegos</option>
+        <option value="superheroes">Superhéroes</option>
+        <option value="paises">Países</option>
+        <option value="franquicias">Franquicias</option>
+        <option value="objetos">Objetos</option>
+        <option value="custom">Custom</option>
+        <option value="otros_jugadores">Otros jugadores</option>
+      </select>
+      <div id="modeDescription"></div>
+      <button onclick="startGame()" id="startBtn">Comenzar Juego</button>
+    </div>
+    <!-- PÁGINA DE JUEGO -->
+    <div id="gamePage">
+      <div id="turnDisplay"></div>
+      <div id="wordDisplay"></div>
+      <div class="game-controls">
+        <button onclick="showWord()" id="showWordBtn" disabled>Mostrar Palabra</button>
+        <button onclick="nextTurn()" id="nextTurnBtn" disabled>Siguiente Turno</button>
+        <!-- El botón de votación se ha eliminado de este panel -->
+      </div>
+      <div class="game-controls">
+        <button onclick="resetGame()" class="danger">Reiniciar</button>
+        <button onclick="resetRound()" class="danger">Reiniciar Todo</button>
+        <button onclick="playAgain()" class="danger">Volver a Jugar</button>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        // ===== GAME STATE =====
-        let players = [];
-        let currentTurn = 0;
-        let impostorIndex = -1;
-        let mainWord = '';
-        let altWord = '';
-        let gameStarted = false;
-        
-        // ===== CATEGORIES =====
-        const categories = {
-            deportes: [],
-            alimentos: [],
-            peliculas: [],
-            series: [],
-            anime: [],
-            videojuegos: [],
-            superheroes: [],
-            paises: [],
-            franquicias: [],
-            objetos: []
-        };
+  <script>
+    /* ===== VARIABLES GLOBALES ===== */
+    let players = []; // Cada jugador: { name, avatar, score }
+    let currentTurn = 0;
+    let impostorIndex = -1;
+    let mainWord = '';
+    let altWord = '';
+    let gameStarted = false;
+    let usedWords = []; // Evitar duplicados
+    let roundsRecap = []; // Resumen de cada ronda
+    let customWords = []; // Para categoría custom
 
-        // ===== DATA LOADING =====
-        async function loadCategoryData(category) {
-            if (categories[category].length === 0) {
-                try {
-                    const response = await fetch(`data/${category}.json`);
-                    const data = await response.json();
-                    categories[category] = data;
-                } catch (error) {
-                    console.error(`Error loading ${category}:`, error);
-                    return [];
-                }
-            }
-            return categories[category];
+    // Categorías cargadas desde JSON (para las que no sean especiales)
+    const categories = {
+      deportes: [],
+      alimentos: [],
+      peliculas: [],
+      series: [],
+      anime: [],
+      videojuegos: [],
+      superheroes: [],
+      paises: [],
+      franquicias: [],
+      objetos: []
+    };
+
+    /* ===== UTILIDADES ===== */
+    function vibrateFeedback() {
+      if (navigator.vibrate) navigator.vibrate(50);
+    }
+    function updateModeDescription() {
+      const mode = document.getElementById('gameMode').value;
+      let description = "";
+      if (mode === "re_perdido") {
+        description = "Solo un jugador no ve la palabra y debe bluffear.";
+      } else {
+        description = "Todos ven palabras, pero uno tiene una palabra diferente.";
+      }
+      document.getElementById('modeDescription').textContent = description;
+    }
+    updateModeDescription();
+
+    /* ===== NAVEGACIÓN ENTRE PÁGINAS ===== */
+    function showConfigPage() {
+      document.getElementById('configPage').style.display = 'block';
+      document.getElementById('gamePage').style.display = 'none';
+    }
+    function showGamePage() {
+      document.getElementById('configPage').style.display = 'none';
+      document.getElementById('gamePage').style.display = 'block';
+    }
+
+    /* ===== PLAYER MANAGEMENT ===== */
+    const avatarList = ['😎','😊','🚀','🌟','🔥','🎯','👾','🤖'];
+    function addPlayer() {
+      vibrateFeedback();
+      const nameInput = document.getElementById('playerName');
+      const name = nameInput.value.trim();
+      if (name && !players.find(p => p.name === name)) {
+        const avatar = avatarList[Math.floor(Math.random() * avatarList.length)];
+        players.push({ name, avatar, score: 0 });
+        nameInput.value = '';
+        updatePlayerList();
+      }
+    }
+    function updatePlayerList() {
+      const playerList = document.getElementById('playerList');
+      playerList.innerHTML = players.map((player, index) => `
+        <div class="player-item" data-index="${index}">
+          <span class="avatar">${player.avatar}</span>
+          <span class="player-name">${player.name}</span>
+          <span class="player-score" style="margin-left:10px;">(${player.score} pts)</span>
+          <button class="remove-btn" onclick="removePlayer(${index})">×</button>
+        </div>
+      `).join('');
+      document.getElementById('minPlayersWarning').style.display = players.length < 2 ? 'block' : 'none';
+      Sortable.create(playerList, {
+        animation: 150,
+        onStart: function(evt) { evt.item.classList.add('dragging'); },
+        onEnd: function(evt) {
+          evt.item.classList.remove('dragging');
+          const movedPlayer = players.splice(evt.oldIndex, 1)[0];
+          players.splice(evt.newIndex, 0, movedPlayer);
+          updatePlayerList();
         }
+      });
+    }
+    function removePlayer(index) {
+      vibrateFeedback();
+      players.splice(index, 1);
+      updatePlayerList();
+    }
+    function randomizeOrder() {
+      vibrateFeedback();
+      players = players.sort(() => Math.random() - 0.5);
+      updatePlayerList();
+    }
 
-        // ===== PLAYER MANAGEMENT =====
-        function addPlayer() {
-            const nameInput = document.getElementById('playerName');
-            const name = nameInput.value.trim();
-            
-            if (name && !players.includes(name)) {
-                players.push(name);
-                nameInput.value = '';
-                updatePlayerList();
-            }
+    /* ===== CATEGORY SELECTION & DATA LOADING ===== */
+    async function loadCategoryData(category) {
+      if (category === "otros_jugadores") {
+        return players.map(p => p.name);
+      }
+      if (category === "custom") {
+        return customWords;
+      }
+      if (categories[category].length === 0) {
+        try {
+          const response = await fetch(`data/${category}.json`);
+          const data = await response.json();
+          categories[category] = data;
+        } catch (error) {
+          console.error(`Error loading ${category}:`, error);
+          return [];
         }
+      }
+      return categories[category];
+    }
 
-        function updatePlayerList() {
-            const playerList = document.getElementById('playerList');
-            playerList.innerHTML = players.map((player, index) => `
-                <div class="player-item" data-index="${index}">
-                    ${player}
-                    <button class="remove-btn" onclick="removePlayer(${index})">×</button>
-                </div>
-            `).join('');
-            
-            Sortable.create(playerList, {
-                animation: 150,
-                onUpdate: (evt) => {
-                    const movedPlayer = players.splice(evt.oldIndex, 1)[0];
-                    players.splice(evt.newIndex, 0, movedPlayer);
-                    updatePlayerList();
-                }
-            });
+    /* ===== GAME LOGIC ===== */
+    async function startGame() {
+      vibrateFeedback();
+      if (players.length < 2) {
+        Swal.fire('Error', '¡Se necesitan al menos 2 jugadores!', 'error');
+        return;
+      }
+      const selectedCategory = document.getElementById('categorySelect').value;
+      const words = await loadCategoryData(selectedCategory);
+      if (words.length < 2) {
+        Swal.fire('Error', 'No hay suficientes palabras en esta categoría', 'error');
+        return;
+      }
+      if (selectedCategory === 'custom' && customWords.length < 2) {
+        Swal.fire('Error', 'Ingresa al menos 2 palabras para la categoría Custom', 'error');
+        return;
+      }
+      Swal.fire({
+        title: '¡Comenzamos!',
+        html: `Modo: ${document.getElementById('gameMode').value.toUpperCase()}<br>
+               Jugadores: ${players.length}<br>
+               Categoría: ${selectedCategory}`,
+        confirmButtonText: '¡Empezar!'
+      }).then(() => {
+        gameStarted = true;
+        impostorIndex = Math.floor(Math.random() * players.length);
+        let availableWords = words.filter(w => !usedWords.includes(w));
+        if (availableWords.length < 2) availableWords = words;
+        mainWord = availableWords[Math.floor(Math.random() * availableWords.length)];
+        usedWords.push(mainWord);
+        do {
+          altWord = availableWords[Math.floor(Math.random() * availableWords.length)];
+        } while (altWord === mainWord);
+        usedWords.push(altWord);
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('showWordBtn').disabled = false;
+        currentTurn = 0;
+        updateTurnDisplay();
+        showGamePage();
+      });
+    }
+    function showWord() {
+      vibrateFeedback();
+      const wordDisplay = document.getElementById('wordDisplay');
+      wordDisplay.classList.add('flip');
+      setTimeout(() => {
+        let word = mainWord;
+        if (currentTurn === impostorIndex) {
+          if (document.getElementById('gameMode').value === 're_perdido') {
+            word = '¡Estás re perdido!';
+          } else {
+            word = altWord;
+          }
         }
+        wordDisplay.innerHTML = (currentTurn === impostorIndex && document.getElementById('gameMode').value === 're_perdido')
+          ? `<span style="color: var(--warning);">${word}</span>`
+          : word;
+        wordDisplay.classList.remove('flip');
+        document.getElementById('showWordBtn').disabled = true;
+        document.getElementById('nextTurnBtn').disabled = false;
+      }, 600);
+    }
+    function nextTurn() {
+      vibrateFeedback();
+      document.getElementById('wordDisplay').textContent = '';
+      currentTurn++;
+      if (currentTurn >= players.length) {
+        startVotingRound();
+        return;
+      }
+      updateTurnDisplay();
+      document.getElementById('showWordBtn').disabled = false;
+      document.getElementById('nextTurnBtn').disabled = true;
+    }
+    function updateTurnDisplay() {
+      document.getElementById('turnDisplay').textContent = `Turno de: ${players[currentTurn].name}`;
+    }
 
-        function removePlayer(index) {
-            players.splice(index, 1);
-            updatePlayerList();
+    /* ===== RONDA DE VOTACIÓN Y SISTEMA DE PUNTUACIÓN ===== */
+    async function startVotingRound() {
+      vibrateFeedback();
+      const votes = [];
+      for (let i = 0; i < players.length; i++) {
+        const options = {};
+        players.forEach((p, index) => {
+          if (index !== i) options[index] = p.name;
+        });
+        const { value: vote } = await Swal.fire({
+          title: `Votación: ${players[i].name}`,
+          input: 'select',
+          inputOptions: options,
+          inputPlaceholder: 'Selecciona al impostor',
+          showCancelButton: false,
+          allowOutsideClick: false
+        });
+        votes.push(parseInt(vote));
+      }
+      const totalPlayers = players.length;
+      const nonImpostorCount = totalPlayers - 1;
+      let correctVotes = 0;
+      for (let i = 0; i < totalPlayers; i++) {
+        if (i !== impostorIndex && votes[i] === impostorIndex) {
+          correctVotes++;
         }
-
-        // ===== GAME LOGIC =====
-        async function startGame() {
-            if (players.length < 2) {
-                Swal.fire('Error', '¡Se necesitan al menos 2 jugadores!', 'error');
-                return;
-            }
-
-            const category = document.getElementById('category').value;
-            const words = await loadCategoryData(category);
-            
-            if (words.length < 2) {
-                Swal.fire('Error', 'No hay suficientes palabras en esta categoría', 'error');
-                return;
-            }
-
-            Swal.fire({
-                title: '¡Comenzamos!',
-                html: `Modo: ${document.getElementById('gameMode').value.toUpperCase()}<br>
-                       Jugadores: ${players.length}<br>
-                       Categoría: ${category}`,
-                confirmButtonText: '¡Empezar!'
-            }).then(() => {
-                gameStarted = true;
-                impostorIndex = Math.floor(Math.random() * players.length);
-                
-                // Asegurarse de que mainWord y altWord sean diferentes
-                mainWord = words[Math.floor(Math.random() * words.length)];
-                do {
-                    altWord = words[Math.floor(Math.random() * words.length)];
-                } while (altWord === mainWord);
-                
-                document.getElementById('startBtn').disabled = true;
-                document.getElementById('showWordBtn').disabled = false;
-                updateTurnDisplay();
-            });
+      }
+      const baseForAll = 100 / totalPlayers;
+      let impostorPoints = 100 - (baseForAll * correctVotes);
+      for (let i = 0; i < totalPlayers; i++) {
+        if (i === impostorIndex) continue;
+        if (votes[i] === impostorIndex) {
+          players[i].roundScore = baseForAll;
+        } else {
+          players[i].roundScore = baseForAll / 2;
         }
-
-        // La función showWord muestra la palabra (o mensaje de impostor) con una animación de fade.
-        function showWord() {
-            const wordDisplay = document.getElementById('wordDisplay');
-            // Animación de fade-out
-            wordDisplay.style.opacity = 0;
-            wordDisplay.style.transform = 'scale(0.8)';
-            
-            setTimeout(() => {
-                let word = mainWord;
-                if (currentTurn === impostorIndex) {
-                    if (document.getElementById('gameMode').value === 're_perdido') {
-                        word = '¡Estás re perdido!';
-                    } else {
-                        word = altWord;
-                    }
-                }
-                
-                wordDisplay.innerHTML = (currentTurn === impostorIndex && document.getElementById('gameMode').value === 're_perdido')
-                    ? `<span class="impostor">${word}</span>`
-                    : word;
-                wordDisplay.style.opacity = 1;
-                wordDisplay.style.transform = 'scale(1)';
-                document.getElementById('showWordBtn').disabled = true;
-                document.getElementById('nextTurnBtn').disabled = false;
-            }, 300);
+      }
+      players[impostorIndex].roundScore = impostorPoints;
+      let winningTeam = "";
+      if (correctVotes > nonImpostorCount / 2) {
+        winningTeam = "nonImpostors";
+      } else if (correctVotes < nonImpostorCount / 2) {
+        winningTeam = "impostor";
+      } else {
+        winningTeam = "tie";
+      }
+      if (winningTeam === "nonImpostors") {
+        for (let i = 0; i < totalPlayers; i++) {
+          if (i !== impostorIndex && votes[i] === impostorIndex) {
+            players[i].roundScore *= 2;
+          }
         }
-
-        // MODIFICADO: Al presionar "Siguiente Turno", se limpia inmediatamente la palabra mostrada.
-        function nextTurn() {
-            // Se limpia la palabra para que el siguiente jugador no vea lo anterior.
-            document.getElementById('wordDisplay').textContent = '';
-            currentTurn++;
-            if (currentTurn >= players.length) {
-                startQuestionRound();
-                return;
-            }
-            
-            updateTurnDisplay();
-            document.getElementById('showWordBtn').disabled = false;
-            document.getElementById('nextTurnBtn').disabled = true;
-        }
-
-        function startQuestionRound() {
-            Swal.fire({
-                title: '¡Ronda de Preguntas!',
-                html: 'Discutan y descubran al impostor',
-                timer: 30000,
-                timerProgressBar: true
-            }).then(() => {
-                endGame();
-            });
-        }
-
-        function endGame() {
-            Swal.fire({
-                title: '¡Juego Terminado!',
-                html: `La palabra era: <strong>${mainWord}</strong><br>
-                       El impostor era: <strong>${players[impostorIndex]}</strong>`,
-                confirmButtonText: 'OK'
-            });
-            resetGameState();
-        }
-
-        // resetGame muestra una confirmación y reinicia el juego eliminando jugadores.
-        function resetGame() {
-            if (confirm('¿Estás seguro de querer reiniciar y eliminar todos los jugadores? Esta acción borrará la lista de jugadores y reiniciará el juego.')) {
-                players = [];
-                resetGameState();
-                updatePlayerList();
-                document.getElementById('startBtn').disabled = false;
-            }
-        }
-
-        // resetRound reinicia la ronda actual (barajea nuevas palabras y permite cambiar de categoría) sin eliminar los jugadores.
-        function resetRound() {
-            if (!gameStarted) return;
-            if (confirm('¿Estás seguro de reiniciar la ronda actual? Se barajará una nueva palabra y/o se podrá cambiar de categoría, pero los jugadores se mantendrán.')) {
-                const category = document.getElementById('category').value;
-                loadCategoryData(category).then(words => {
-                    if (words.length < 2) {
-                        Swal.fire('Error', 'No hay suficientes palabras en esta categoría', 'error');
-                        return;
-                    }
-                    impostorIndex = Math.floor(Math.random() * players.length);
-                    
-                    mainWord = words[Math.floor(Math.random() * words.length)];
-                    do {
-                        altWord = words[Math.floor(Math.random() * words.length)];
-                    } while (altWord === mainWord);
-                    
-                    // Reiniciar turno para el primer jugador de la ronda
-                    currentTurn = 0;
-                    updateTurnDisplay();
-                    
-                    // Limpiar la pantalla para que el siguiente jugador presione "Mostrar Palabra"
-                    document.getElementById('wordDisplay').textContent = "";
-                    document.getElementById('showWordBtn').disabled = false;
-                    document.getElementById('nextTurnBtn').disabled = true;
-                });
-            }
-        }
-
-        function resetGameState() {
-            gameStarted = false;
-            currentTurn = 0;
-            impostorIndex = -1;
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('showWordBtn').disabled = true;
-            document.getElementById('nextTurnBtn').disabled = true;
-            document.getElementById('endGameBtn').disabled = true;
-            document.getElementById('turnDisplay').textContent = '';
-            document.getElementById('wordDisplay').textContent = '';
-        }
-
-        // ===== UTILITIES =====
-        function updateTurnDisplay() {
-            document.getElementById('turnDisplay').textContent = 
-                `Turno de: ${players[currentTurn]}`;
-        }
-
-        function showTutorial() {
-            Swal.fire({
-                title: '¿Cómo Jugar?',
-                html: `<ol>
-                    <li>Añade al menos 2 jugadores</li>
-                    <li>Selecciona el modo de juego y la categoría</li>
-                    <li>Presiona "Comenzar Juego"</li>
-                    <li>Cada jugador verá su palabra cuando sea su turno</li>
-                    <li>El impostor debe engañar a los demás</li>
-                    <li>Antes de pasar el teléfono, presiona "Siguiente Turno" para borrar la palabra del jugador anterior</li>
-                    <li>Después de todos los turnos, discutan quién creen que es el impostor</li>
-                </ol>`,
-                confirmButtonText: 'Entendido'
-            });
-        }
-
-        // Inicializar lista de jugadores al cargar la página.
-        document.addEventListener('DOMContentLoaded', updatePlayerList);
-    </script>
+      } else if (winningTeam === "impostor") {
+        players[impostorIndex].roundScore *= 2;
+      }
+      players.forEach(player => {
+        player.score += player.roundScore || 0;
+      });
+      roundsRecap.push({
+        impostor: players[impostorIndex].name,
+        mainWord,
+        altWord,
+        votes: votes.slice(),
+        roundScores: players.map(p => p.roundScore || 0)
+      });
+      let recapHTML = `<h3>Resultados de la Ronda</h3>
+                       <p>Impostor real: <strong>${players[impostorIndex].name}</strong></p>
+                       <p>Votos correctos: ${correctVotes} de ${nonImpostorCount}</p>
+                       <h3>Puntos de la ronda</h3>`;
+      players.forEach((p, index) => {
+        recapHTML += `<p>${p.name}: ${p.roundScore ? p.roundScore.toFixed(1) : 0} pts</p>`;
+      });
+      await Swal.fire({
+        title: 'Resultados de la Ronda',
+        html: recapHTML,
+        confirmButtonText: 'Continuar'
+      });
+      endGame();
+    }
+    function endGame() {
+      vibrateFeedback();
+      let recapHTML = '<h3>Resumen de la Sesión</h3>';
+      roundsRecap.forEach((round, index) => {
+        recapHTML += `<p>Ronda ${index + 1}: Impostor: ${round.impostor}, Palabra: ${round.mainWord}</p>`;
+      });
+      recapHTML += '<h3>Puntajes Finales</h3>';
+      players.forEach(p => {
+        recapHTML += `<p>${p.name}: ${p.score.toFixed(1)} pts</p>`;
+      });
+      Swal.fire({
+        title: '¡Juego Terminado!',
+        html: recapHTML,
+        confirmButtonText: 'OK'
+      });
+      // Se muestra el botón "Volver a Jugar" para iniciar otra ronda
+      document.getElementById('showWordBtn').disabled = true;
+      document.getElementById('nextTurnBtn').disabled = true;
+    }
+    // Función para "Volver a Jugar" sin perder jugadores ni puntajes acumulados
+    function playAgain() {
+      vibrateFeedback();
+      if (!gameStarted) return;
+      resetRound();
+    }
+    function resetGame() {
+      vibrateFeedback();
+      if (confirm('¿Estás seguro de querer reiniciar y eliminar todos los jugadores?')) {
+        players = [];
+        resetGameState();
+        updatePlayerList();
+        document.getElementById('startBtn').disabled = false;
+        showConfigPage();
+      }
+    }
+    function resetRound() {
+      vibrateFeedback();
+      if (!gameStarted) return;
+      if (confirm('¿Estás seguro de reiniciar la ronda actual? Los jugadores y puntajes se mantendrán.')) {
+        const selectedCategory = document.getElementById('categorySelect').value;
+        loadCategoryData(selectedCategory).then(words => {
+          if (words.length < 2) {
+            Swal.fire('Error', 'No hay suficientes palabras en esta categoría', 'error');
+            return;
+          }
+          impostorIndex = Math.floor(Math.random() * players.length);
+          let availableWords = words.filter(w => !usedWords.includes(w));
+          if (availableWords.length < 2) availableWords = words;
+          mainWord = availableWords[Math.floor(Math.random() * availableWords.length)];
+          usedWords.push(mainWord);
+          do {
+            altWord = availableWords[Math.floor(Math.random() * availableWords.length)];
+          } while (altWord === mainWord);
+          usedWords.push(altWord);
+          currentTurn = 0;
+          updateTurnDisplay();
+          document.getElementById('wordDisplay').textContent = "";
+          document.getElementById('showWordBtn').disabled = false;
+          document.getElementById('nextTurnBtn').disabled = true;
+        });
+      }
+    }
+    function resetGameState() {
+      gameStarted = false;
+      currentTurn = 0;
+      impostorIndex = -1;
+      usedWords = [];
+      roundsRecap = [];
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('showWordBtn').disabled = true;
+      document.getElementById('nextTurnBtn').disabled = true;
+      document.getElementById('turnDisplay').textContent = '';
+      document.getElementById('wordDisplay').textContent = '';
+    }
+    /* ===== TUTORIAL ===== */
+    function showTutorial() {
+      Swal.fire({
+        title: '¿Cómo Jugar?',
+        html: `<ol>
+          <li>Añade al menos 2 jugadores usando el cuadro superior y los botones "Añadir Jugador" y "Randomizar".</li>
+          <li>Selecciona el modo de juego y la categoría en los menús desplegables (centrados en pantalla).</li>
+          <li>Presiona "Comenzar Juego" para iniciar; este botón está resaltado en amarillo.</li>
+          <li>En el Juego, cada jugador presiona "Mostrar Palabra" para ver su palabra con una animación flip.</li>
+          <li>Antes de pasar el dispositivo, presiona "Siguiente Turno" para borrar la palabra.</li>
+          <li>Al finalizar la ronda, se inicia la votación y se asignan puntos según:
+            <ul>
+              <li><strong>Impostor:</strong> 100 – (100/numJugadores * votos correctos).</li>
+              <li><strong>No impostores:</strong> Si votaron al impostor, reciben 100/numJugadores; de lo contrario, la mitad.</li>
+              <li>El equipo ganador recibe el doble de puntos; en empate, sin bonificación.</li>
+              <li>Los puntos se acumulan en cada ronda.</li>
+            </ul>
+          </li>
+          <li>Al terminar, usa "Volver a Jugar" para iniciar otra ronda sin perder puntajes.</li>
+        </ol>`,
+        confirmButtonText: 'Entendido'
+      });
+    }
+    document.addEventListener('DOMContentLoaded', updatePlayerList);
+  </script>
 </body>
 </html>
