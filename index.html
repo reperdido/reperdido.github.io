@@ -1186,9 +1186,8 @@ function revealWord() {
     } else {
       // Modo Requete Perdido: el impostor NO debe saber que es diferente
       word = altWord;
-      hint = 'Esta es la palabra de la ronda'; // Mismo hint que los demás
-      // No se agrega clase especial de impostor
-      // Se eliminan clases previas por si acaso
+      hint = 'Esta es la palabra de la ronda';
+      // Aseguramos que no tenga clases de impostor
       document.getElementById('wordFaceFront').classList.remove('impostor-face');
       document.getElementById('wordTextEl').classList.remove('impostor-text');
     }
