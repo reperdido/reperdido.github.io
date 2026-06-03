@@ -654,7 +654,7 @@
       <div class="mode-cards">
         <div class="mode-card selected" data-mode="re_perdido" onclick="selectMode(this)">
           <div class="mode-title">🔇 Re Perdido</div>
-          <div class="mode-desc">El impostor no ve ninguna palabra y debe bluffear a ciegas.</div>
+          <div class="mode-desc">El impostor no ve ninguna palabra y debe pretender que si.</div>
         </div>
         <div class="mode-card" data-mode="requete_perdido" onclick="selectMode(this)">
           <div class="mode-title">🔀 Requete Perdido</div>
@@ -1356,7 +1356,7 @@ function revealWord() {
   let word, hint;
   if (isImpostor && gameMode === 're_perdido') {
     word = '¡Estás re perdido!';
-    hint = 'No conoces la palabra — ¡bluffea!';
+    hint = 'No conoces la palabra ¡Finge!';
     document.getElementById('wordFaceFront').classList.add('impostor-face');
     document.getElementById('wordTextEl').classList.add('impostor-text');
   } else if (isImpostor && gameMode === 'requete_perdido') {
