@@ -1183,10 +1183,6 @@ function revealWord() {
       hint = 'No conoces la palabra — ¡bluffea!';
       document.getElementById('wordFaceFront').classList.add('impostor-face');
       document.getElementById('wordTextEl').classList.add('impostor-text');
-    } else {
-      word = altWord;
-      hint = 'Tu palabra es diferente a los demás';
-      document.getElementById('wordFaceFront').classList.add('impostor-face');
     }
   } else {
     word = mainWord;
