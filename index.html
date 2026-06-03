@@ -816,15 +816,16 @@ const CATEGORIES_DEF = {
       franquicias: { icon: '🏢', label: 'Franquicias',   file: 'franquicias.json' },
       objetos:     { icon: '🪑', label: 'Objetos',        file: 'objetos.json' }
     }
-    },
+ },
   animales: {
-    icon: '🐒', label: 'Animales',
+    icon: '🐘', label: 'Animales',
+    isSingleCategory: true,
+    file: 'animales.json'
   },
   jugadores: {
-    icon: '👥', label: 'Jugadores',
-    subcats: {
-      otros_jugadores: { icon: '👤', label: 'Nombres de jugadores', file: '__players__' }
-    }
+    icon: '👥', label: 'Otros Jugadores',
+    isSingleCategory: true,
+    file: '__players__'
   }
 };
 
