@@ -1169,35 +1169,27 @@ function showWordTurn() {
   document.getElementById('nextTurnBtn').disabled = true;
   document.getElementById('wordCard').style.pointerEvents = 'auto';
   showScreen('wordScreen');
+}
+
 function revealWord() {
   const inner = document.getElementById('wordCardInner');
   if (inner.classList.contains('flipped')) return;
   vibrate(60);
   const isImpostor = (currentTurn === impostorIndex);
   let word, hint;
-  
-  if (isImpostor) {
-    if (gameMode === 're_perdido') {
-      // Modo Re Perdido: el impostor SABE que está perdido
-      word = '¡Estás re perdido!';
-      hint = 'No conoces la palabra, ¡Disimula!';
-      document.getElementById('wordFaceFront').classList.add('impostor-face');
-      document.getElementById('wordTextEl').classList.add('impostor-text');
-    } else {
-      // Modo Requete Perdido: el impostor NO debe saber que es diferente
-      word = altWord;
-      hint = 'Esta es la palabra de la ronda';
-      // Aseguramos que no tenga clases de impostor
-      document.getElementById('wordFaceFront').classList.remove('impostor-face');
-      document.getElementById('wordTextEl').classList.remove('impostor-text');
-    }
+  if (isImpostor && gameMode === 're_perdido') {
+    word = '¡Estás re perdido!';
+    hint = 'No conoces la palabra — ¡bluffea!';
+    document.getElementById('wordFaceFront').classList.add('impostor-face');
+    document.getElementById('wordTextEl').classList.add('impostor-text');
+  } else if (isImpostor && gameMode === 'requete_perdido') {
+    word = altWord;
+    hint = 'Esta es la palabra de la ronda';
+    // No impostor-face / impostor-text: card looks identical to everyone else
   } else {
     word = mainWord;
     hint = 'Esta es la palabra de la ronda';
-    document.getElementById('wordFaceFront').classList.remove('impostor-face');
-    document.getElementById('wordTextEl').classList.remove('impostor-text');
   }
-  
   document.getElementById('wordTextEl').textContent = word;
   document.getElementById('wordHintEl').textContent = hint;
   inner.classList.add('flipped');
