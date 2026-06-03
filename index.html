@@ -816,16 +816,14 @@ const CATEGORIES_DEF = {
       franquicias: { icon: '🏢', label: 'Franquicias',   file: 'franquicias.json' },
       objetos:     { icon: '🪑', label: 'Objetos',        file: 'objetos.json' }
     }
- },
-  animales: {
-    icon: '🐘', label: 'Animales',
-    isSingleCategory: true,
-    file: 'animales.json'
   },
-  jugadores: {
+  animales: {
+    icon: '🐾', label: 'Animales',
+    flat: true, file: 'animales.json'
+  },
+  otros_jugadores: {
     icon: '👥', label: 'Otros Jugadores',
-    isSingleCategory: true,
-    file: '__players__'
+    flat: true, file: '__players__'
   }
 };
 
@@ -956,14 +954,20 @@ function renderCategoryRoot() {
   document.getElementById('catSubtitle').textContent   = 'Elige una categoría de palabras';
   const grid = document.getElementById('catGrid');
 
-  // Built-in
-  let html = Object.entries(CATEGORIES_DEF).map(([key, cat]) => `
-    <div class="cat-card" onclick="openParentCategory('${key}')">
+  // Built-in — flat categories go direct to load, others open submenu
+  let html = Object.entries(CATEGORIES_DEF).map(([key, cat]) => {
+    if (cat.flat) {
+      return `<div class="cat-card" onclick="selectFlatCategory('${key}')">
+        <span class="cat-icon">${cat.icon}</span>
+        <span class="cat-name">${cat.label}</span>
+      </div>`;
+    }
+    return `<div class="cat-card" onclick="openParentCategory('${key}')">
       <span class="cat-icon">${cat.icon}</span>
       <span class="cat-name">${cat.label}</span>
       <span class="cat-count">${Object.keys(cat.subcats).length} subcategorías</span>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 
   // Custom
   const customs = getCustomCategories();
@@ -1040,6 +1044,16 @@ async function selectMixAll(parentKey) {
   }
   categoryWords = all;
   categoryLabel = `${cat.icon} ${cat.label} (mezclado)`;
+  proceedToGameConfig();
+}
+
+async function selectFlatCategory(key) {
+  const cat = CATEGORIES_DEF[key];
+  if (!cat || !cat.flat) return;
+  const words = await loadWords(cat.file, key, key);
+  if (!words) return;
+  categoryWords = words;
+  categoryLabel = `${cat.icon} ${cat.label}`;
   proceedToGameConfig();
 }
 
