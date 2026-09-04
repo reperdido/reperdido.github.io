@@ -182,9 +182,9 @@
     .player-item.sortable-ghost { opacity: .4; }
     .player-item.sortable-drag  { box-shadow: var(--shadow); border-color: var(--btn-primary); transform: scale(1.02); }
     .player-item .p-avatar { font-size: 1.5rem; flex-shrink: 0; }
-    .player-item .p-name  { font-family: 'Syne', sans-serif; font-weight: 600; flex: 1; }
-    .player-item .p-score { font-size: .82rem; color: var(--btn-primary); font-weight: 700; white-space: nowrap; }
-    .player-item .p-del   { background: transparent; border: none; cursor: pointer; color: var(--text-dim); font-size: 1.1rem; padding: .2rem .4rem; line-height: 1; border-radius: 6px; transition: color .2s; }
+    .player-item .p-name  { font-family: 'Syne', sans-serif; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .player-item .p-score { font-size: .82rem; color: var(--btn-primary); font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+    .player-item .p-del   { background: transparent; border: none; cursor: pointer; color: var(--text-dim); font-size: 1.1rem; padding: .2rem .4rem; line-height: 1; border-radius: 6px; transition: color .2s; flex-shrink: 0; }
     .player-item .p-del:hover { color: var(--danger); }
 
     .warning-text { color: var(--danger); font-size: .85rem; text-align: center; margin-bottom: .5rem; }
@@ -382,7 +382,7 @@
       padding: 1.25rem;
       margin: 1rem 0;
     }
-    .result-reveal .impostor-reveal .big-avatar { font-size: 3rem; display: block; margin-bottom: .4rem; }
+    .result-reveal .impostor-reveal .big-avatar { width: 64px; height: 64px; object-fit: contain; border-radius: 50%; display: block; margin: 0 auto .4rem; }
     .result-reveal .impostor-reveal .impostor-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--danger); }
     .result-reveal .word-info { color: var(--text-dim); font-size: .9rem; margin-top: .5rem; }
     .result-reveal .word-info strong { color: var(--text); }
@@ -531,29 +531,41 @@
     .player-item .p-del:hover {
       opacity: 1;
     }
-    .palette-row {
-      display: flex;
-      gap: 4px;
-      flex-shrink: 0;
-      margin-right: 4px;
-    }
-    .palette-swatch {
-      width: 18px;
-      height: 18px;
+    .p-avatar-btn {
+      background: rgba(0,0,0,.15);
+      border: 2px solid rgba(255,255,255,.25);
       border-radius: 50%;
+      width: 36px; height: 36px;
+      padding: 0; flex-shrink: 0;
       cursor: pointer;
-      border: 2px solid rgba(255,255,255,0.3);
-      transition: transform 0.15s, border-color 0.15s;
-      flex-shrink: 0;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color .15s, transform .15s;
     }
-    .palette-swatch:hover {
-      transform: scale(1.15);
-      border-color: rgba(255,255,255,0.8);
+    .p-avatar-btn:hover { border-color: #fff; transform: scale(1.05); }
+    .p-avatar-btn img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+    .p-avatar-btn::after {
+      content: '✎'; position: absolute; bottom: -3px; right: -3px;
+      width: 15px; height: 15px; border-radius: 50%;
+      background: var(--btn-primary); color: var(--btn-primary-text);
+      font-size: .6rem; display: flex; align-items: center; justify-content: center;
+      line-height: 1;
     }
-    .palette-swatch.selected {
-      border-color: #fff;
-      box-shadow: 0 0 0 2px rgba(0,0,0,0.3);
+    .avatar-pick-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: .5rem; margin-top: .4rem; }
+    .avatar-pick {
+      width: 100%; aspect-ratio: 1; border-radius: 50%; object-fit: contain;
+      cursor: pointer; border: 2px solid transparent; padding: 2px;
+      background: rgba(0,0,0,.15); transition: border-color .15s, transform .15s;
     }
+    .avatar-pick:hover { transform: scale(1.06); }
+    .avatar-pick.selected { border-color: var(--btn-primary); box-shadow: 0 0 0 2px rgba(244,208,63,.3); }
+    .color-pick-grid { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .4rem; }
+    .color-pick {
+      width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+      border: 2px solid rgba(255,255,255,.3); transition: transform .15s, border-color .15s;
+    }
+    .color-pick:hover { transform: scale(1.12); }
+    .color-pick.selected { border-color: #fff; box-shadow: 0 0 0 2px rgba(0,0,0,.3); }
 
     /* Colored score chips in game bar */
     .score-chip {
@@ -849,6 +861,27 @@
 </div>
 
 <!-- ==============================
+     MODAL: Edit Player Avatar/Color
+============================== -->
+<div id="playerEditModal" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Editar jugador</h2>
+    <div class="form-group">
+      <label>Avatar</label>
+      <div class="avatar-pick-grid" id="avatarPickGrid"></div>
+    </div>
+    <div class="form-group">
+      <label>Color</label>
+      <div class="color-pick-grid" id="colorPickGrid"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" style="flex:1" onclick="closePlayerEditModal()">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="savePlayerEdit()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==============================
      MODAL: Settings
 ============================== -->
 <div id="settingsModal" class="modal-overlay">
@@ -1008,13 +1041,51 @@ function removePlayer(i) {
   vibrate();
 }
 
-function changePlayerColor(i, color) {
-  players[i].color = color;
+/* ── Player Edit Modal (avatar + color) ─── */
+let editingPlayerIdx = null;
+let editPickAvatar = null;
+let editPickColor = null;
+
+function openPlayerEditModal(i) {
+  editingPlayerIdx = i;
+  editPickAvatar = players[i].avatar;
+  editPickColor = players[i].color || PLAYER_COLORS[0];
+
+  document.getElementById('avatarPickGrid').innerHTML = AVATARS.map(a =>
+    `<img class="avatar-pick ${a === editPickAvatar ? 'selected' : ''}" src="${a}" alt="" onclick="choosePickAvatar('${a}')">`
+  ).join('');
+  document.getElementById('colorPickGrid').innerHTML = PLAYER_COLORS.map(c =>
+    `<span class="color-pick ${c === editPickColor ? 'selected' : ''}" style="background:${c}" onclick="choosePickColor('${c}')" title="${c}"></span>`
+  ).join('');
+
+  document.getElementById('playerEditModal').classList.add('open');
+}
+
+function choosePickAvatar(a) {
+  editPickAvatar = a;
+  document.querySelectorAll('#avatarPickGrid .avatar-pick').forEach(el => el.classList.toggle('selected', el.src.endsWith(a)));
+  vibrate(20);
+}
+
+function choosePickColor(c) {
+  editPickColor = c;
+  document.querySelectorAll('#colorPickGrid .color-pick').forEach(el => el.classList.toggle('selected', el.title === c));
+  vibrate(20);
+}
+
+function savePlayerEdit() {
+  if (editingPlayerIdx === null) return;
+  players[editingPlayerIdx].avatar = editPickAvatar;
+  players[editingPlayerIdx].color = editPickColor;
+  closePlayerEditModal();
   renderPlayerList();
   vibrate(30);
 }
 
-
+function closePlayerEditModal() {
+  document.getElementById('playerEditModal').classList.remove('open');
+  editingPlayerIdx = null;
+}
 
 function randomizeOrder() {
   for (let i = players.length - 1; i > 0; i--) {
@@ -1035,13 +1106,12 @@ function renderPlayerList() {
   el.innerHTML = players.map((p, i) => {
     const textColor = getContrastColor(p.color || '#118AB2');
     return `<div class="player-item" data-index="${i}" style="--player-color:${p.color || '#118AB2'}; --player-text:${textColor}">
-      <img class="p-avatar" src="${p.avatar}" alt="" style="width:28px;height:28px;object-fit:contain;border-radius:50%;">
+      <button class="p-avatar-btn" onclick="event.stopPropagation();openPlayerEditModal(${i})" title="Editar avatar y color">
+        <img src="${p.avatar}" alt="">
+      </button>
       <span class="p-name">${escHtml(p.name)}</span>
       <span class="p-score">${p.score} pts</span>
-      <div class="palette-row">
-        ${PLAYER_COLORS.map(c => `<span class="palette-swatch ${c === (p.color || '#118AB2') ? 'selected' : ''}" style="background:${c}" onclick="event.stopPropagation();changePlayerColor(${i}, '${c}')" title="${c}"></span>`).join('')}
-      </div>
-      <button class="p-del" onclick="removePlayer(${i})" title="Eliminar">✕</button>
+      <button class="p-del" onclick="event.stopPropagation();removePlayer(${i})" title="Eliminar">✕</button>
     </div>`;
   }).join('');
   document.getElementById('minWarning').style.display = players.length < 2 ? 'block' : 'none';
@@ -1481,7 +1551,7 @@ function showResults(deltas, majority, correctVotes, nonImpCount) {
   document.getElementById('resultReveal').innerHTML = `
     <p class="dim">El impostor era…</p>
     <div class="impostor-reveal">
-      <span class="big-avatar">${imp.avatar}</span>
+      <img class="big-avatar" src="${imp.avatar}" alt="">
       <div class="impostor-name">${escHtml(imp.name)}</div>
       <div class="word-info">
         Palabra principal: <strong>${escHtml(mainWord)}</strong>
@@ -1647,7 +1717,7 @@ function openCustomCatModal(editKey = null) {
 
   // Populate emoji picker
   document.getElementById('iconPicker').innerHTML = EMOJI_OPTIONS.map(e =>
-    `<img class="icon-pick ${e === selectedIcon ? 'selected' : ''}" src="${e}" alt="" onclick="pickIcon('${e}')" style="width:28px;height:28px;object-fit:contain;border-radius:8px;cursor:pointer;padding:2px;border:2px solid transparent;">`
+    `<span class="icon-pick ${e === selectedIcon ? 'selected' : ''}" data-emoji="${e}" onclick="pickIcon('${e}')">${e}</span>`
   ).join('');
 
   if (editKey) {
@@ -1659,7 +1729,7 @@ function openCustomCatModal(editKey = null) {
       document.getElementById('customCatWords').value = cat.words.join('\n');
       selectedIcon = cat.icon;
       document.querySelectorAll('.icon-pick').forEach(el => {
-        el.classList.toggle('selected', el.textContent === selectedIcon);
+        el.classList.toggle('selected', el.dataset.emoji === selectedIcon);
       });
     }
   } else {
@@ -1673,7 +1743,7 @@ function openCustomCatModal(editKey = null) {
 function pickIcon(e) {
   selectedIcon = e;
   document.querySelectorAll('.icon-pick').forEach(el => {
-    el.classList.toggle('selected', el.textContent === e);
+    el.classList.toggle('selected', el.dataset.emoji === e);
   });
 }
 
