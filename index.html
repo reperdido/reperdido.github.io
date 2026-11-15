@@ -214,6 +214,7 @@
       display: flex; flex-direction: column; align-items: center; gap: .4rem;
     }
     .cat-card:hover { background: var(--card); border-color: var(--card2); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .cat-card.selected, .cat-card.selected:hover { background: rgba(30,111,92,.4); border-color: #2C8F7A; transform: none; box-shadow: none; }
     .cat-card .cat-icon { width: 32px; height: 32px; object-fit: contain; display: block; margin-bottom: 4px; }
     .cat-card .cat-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .88rem; line-height: 1.2; }
     .cat-card .cat-count { font-size: .75rem; color: var(--text-dim); }
@@ -326,11 +327,11 @@
       font-family: 'Syne', sans-serif;
       font-size: clamp(1.4rem, 6vw, 2.5rem);
       font-weight: 800;
-      color: var(--text);
+      color: #fff;
       text-align: center;
       line-height: 1.15;
     }
-    .word-text.impostor-text { color: var(--danger); }
+    .word-text.impostor-text { color: #fff; }
     .word-hint { font-size: .85rem; color: var(--text-dim); margin-top: .4rem; text-align: center; }
     .next-turn-area { padding: 1rem; max-width: 680px; margin: 0 auto; width: 100%; }
 
@@ -673,7 +674,7 @@
       <div id="minWarning" class="warning-text" style="display:none">¡Se necesitan al menos 2 jugadores!</div>
       <div class="setup-actions">
         <button class="btn btn-ghost btn-sm" onclick="randomizeOrder()" style="flex:1">🔀 Randomizar</button>
-        <button class="btn btn-ghost btn-sm" onclick="openSettings()" style="flex:1">⚙️ Ajustes</button>
+        <button class="btn btn-ghost btn-sm" onclick="confirmClearPlayers()" title="Eliminar todos" aria-label="Eliminar todos" style="flex:1">🗑️ Borrar todos</button>
       </div>
     </div>
     <div class="bottom-actions">
@@ -694,6 +695,10 @@
     </div>
     <div class="page-content">
       <div id="catGrid" class="cat-grid"></div>
+    </div>
+    <div class="bottom-actions">
+      <button class="btn btn-ghost btn-full" id="selectAllCategoriesBtn" onclick="toggleAllCategories()">Seleccionar todas</button>
+      <button class="btn btn-primary btn-lg btn-full" id="acceptCategoriesBtn" onclick="acceptSelectedCategories()">Aceptar selección</button>
     </div>
   </div>
 
@@ -828,7 +833,7 @@
       <div id="roundHistory" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem"></div>
     </div>
     <div class="bottom-actions">
-      <button class="btn btn-secondary btn-full" onclick="playAgain()">🔄 Otra partida (mismos jugadores)</button>
+      <button class="btn btn-secondary btn-full" onclick="playAgain()">🔄 Otra partida</button>
       <button class="btn btn-ghost btn-full" onclick="newGame()">🏠 Nueva partida</button>
     </div>
   </div>
@@ -919,50 +924,46 @@
    ============================================================ */
 
 /* ── Categories definition (embedded for offline use) ─── */
-const CATEGORIES_DEF = {
-  geografia: {
-    icon: '🌍', label: 'Geografía',
-    subcats: {
-      paises:    { icon: '🏳️', label: 'Países',    file: 'paises.json' },
-      capitales: { icon: '🏛️', label: 'Capitales', file: 'capitales.json' },
-      ciudades:  { icon: '🏙️', label: 'Ciudades',  file: 'ciudades.json' }
-    }
-  },
-  entretenimiento: {
-    icon: '🎬', label: 'Entretenimiento',
-    subcats: {
-      peliculas:   { icon: '🎥', label: 'Películas',     file: 'peliculas.json' },
-      series:      { icon: '📺', label: 'Series',         file: 'series.json' },
-      anime:       { icon: '⛩️', label: 'Anime',          file: 'anime.json' },
-      videojuegos: { icon: '🎮', label: 'Videojuegos',    file: 'videojuegos.json' },
-      superheroes: { icon: '🦸', label: 'Superhéroes',    file: 'superheroes.json' }
-    }
-  },
-  comida: {
-    icon: '🍕', label: 'Comida & Bebida',
-    subcats: {
-      alimentos: { icon: '🥗', label: 'Alimentos',  file: 'alimentos.json' },
-      frutas:    { icon: '🍓', label: 'Frutas',      file: 'frutas.json' },
-      bebidas:   { icon: '🥤', label: 'Bebidas',     file: 'bebidas.json' }
-    }
-  },
-  cultura: {
-    icon: '🎭', label: 'Cultura & Más',
-    subcats: {
-      deportes:    { icon: '⚽', label: 'Deportes',      file: 'deportes.json' },
-      franquicias: { icon: '🏢', label: 'Franquicias',   file: 'franquicias.json' },
-      objetos:     { icon: '🪑', label: 'Objetos',        file: 'objetos.json' }
-    }
-  },
-  animales: {
-    icon: '🐾', label: 'Animales',
-    flat: true, file: 'animales.json'
-  },
-  otros_jugadores: {
-    icon: '👥', label: 'Otros Jugadores',
-    flat: true, file: '__players__'
-  }
-};
+const CATEGORY_ROWS = [
+  ['animales','🐾','Animales',[
+    ['mamiferos','Mamíferos','Mamíferos salvajes de tierra firme: leones, monos, osos.'],['aves','Aves','Animales con plumas, pico y alas.'],['reptiles_anfibios','Reptiles y anfibios','Escamas, sangre fría, ranas, serpientes y tortugas.'],['marinos','Marinos','Peces, ballenas, delfines, pulpos, medusas y crustáceos.'],['bichos','Bichos','Insectos y arácnidos: arañas, abejas y mariposas.'],['domesticos','Domésticos','Animales de compañía y de granja.'],['extintos','Extintos','Dinosaurios, mamuts y especies desaparecidas.']]],
+  ['comida_bebida','🍲','Comida y Bebida',[
+    ['vegetales','Vegetales','Frutas, verduras, raíces, granos y hongos.'],['origen_animal','Origen animal','Carnes, pescados, huevos, lácteos y miel.'],['harinas','Harinas','Pan, pasta, harinas y cereales de caja.'],['platos','Platos','Comidas hechas que mezclan ingredientes.'],['dulces','Dulces','Golosinas, pasteles, helados y azúcar.'],['bebidas','Bebidas','Todo lo que se toma en vaso o taza.'],['condimentos','Condimentos','Aderezos, salsas, especias, sal, aceites y grasas.'],['snacks','Snacks','Papas fritas, galletas, maní y cosas saladas para picar.']]],
+  ['geografia','🌍','Geografía',[
+    ['paises','Países','Naciones soberanas del mundo.'],['provincias','Provincias','Estados, provincias y departamentos de un país.'],['regiones','Regiones','Continentes y zonas geográficas o culturales.'],['ciudades','Ciudades','Capitales, metrópolis, pueblos y barrios conocidos.'],['monumentos','Monumentos','Maravillas, ruinas, puentes y edificios icónicos.'],['aguas','Aguas','Ríos, lagos, mares, penínsulas y playas.'],['naturaleza','Naturaleza','Montañas, volcanes, desiertos y biomas.']]],
+  ['cine_tv','🎬','Cine y TV',[
+    ['peliculas_clasicas','Películas clásicas','Éxitos históricos de antes del 2000.'],['cine_moderno','Cine moderno','Estrenos, blockbusters y películas desde el 2000.'],['sagas','Sagas','Universos cinematográficos y secuelas famosas.'],['actores','Actores','Estrellas de la pantalla grande y directores.'],['series','Series','Dramas, comedias, sitcoms y streaming.'],['doramas','Doramas','Series coreanas, japonesas y otras producciones asiáticas.'],['realities','Realities','Concursos, talentos y telerrealidad.'],['telenovelas','Telenovelas','Dramas televisivos y producciones clásicas.'],['presentadores','Presentadores','Conductores, periodistas y estrellas de televisión.'],['caricaturas','Caricaturas occidentales','Dibujos animados de EE. UU. y Europa.'],['peliculas_animadas','Películas animadas','Largometrajes de estudios como Disney o Pixar.'],['animacion_asiatica','Animación asiática','Anime, donghua, animación coreana y otros.']]],
+  ['musica','🎵','Música',[
+    ['musicos','Músicos','Solistas, grupos y dúos musicales.'],['hits_actuales','Hits actuales','Canciones populares y éxitos modernos.'],['clasicos_retro','Clásicos retro','Canciones antiguas, rock clásico y recuerdos.'],['musica_regional','Música regional','Artistas y canciones del folclore y la música local.'],['kpop','K-pop','Grupos y solistas coreanos y música pop asiática.'],['instrumentos','Instrumentos','Guitarras, tambores, pianos y todo lo que se toca.'],['generos','Géneros','Rock, cumbia, jazz, reggaetón y otros estilos.']]],
+  ['literatura','📚','Literatura',[
+    ['libros','Libros','Obras literarias, cuentos y best-sellers.'],['comics','Cómics','Historietas y novelas gráficas occidentales.'],['manga','Manga','Cómics japoneses y sus franquicias.'],['webtoons','Webtoons','Cómics coreanos, chinos y digitales.'],['escritores','Escritores','Novelistas, poetas y creadores famosos.']]],
+  ['ficcion','✨','Ficción',[
+    ['personajes_occidentales','Personajes occidentales','Héroes, antihéroes, villanos o personajes secundarios.'],['personajes_orientales','Personajes orientales','Héroes, villanos y protagonistas de obras modernas.'],['criaturas','Criaturas','Alienígenas, monstruos, dragones y especies inventadas.'],['escenarios','Escenarios','Mundos imaginarios, planetas, reinos y escuelas.'],['organizaciones','Organizaciones','Desde equipos de héroes hasta imperios galácticos.'],['artefactos','Artefactos','Armas legendarias, reliquias y objetos mágicos.'],['poderes','Poderes','Magia, superpoderes y habilidades especiales.']]],
+  ['personas','👤','Personas',[
+    ['lideres','Líderes','Presidentes, gobernantes y realeza de la actualidad.'],['empresarios','Empresarios','Fundadores de empresas, millonarios e inventores.'],['historicos','Históricos','Próceres, filósofos, científicos y reyes del pasado.'],['creadores_digitales','Creadores digitales','Youtubers, streamers, influencers y figuras de internet.'],['celebridades','Celebridades','Modelos, filántropos y figuras públicas generales.']]],
+  ['arte_cultura','🎭','Arte y Cultura',[
+    ['piezas_arte','Piezas de arte','Obras maestras, cuadros famosos y esculturas.'],['artistas','Artistas','Pintores, escultores y fotógrafos famosos.'],['estilos','Estilos','Corrientes artísticas y arquitectónicas: cubismo, gótico, barroco.'],['espectaculos','Espectáculos','Musicales, ópera, ballet, circo y obras teatrales.'],['mitologia','Mitología','Dioses, héroes y leyendas de la antigüedad.'],['festividades','Festividades','Fiestas, tradiciones y celebraciones: Carnaval, Navidad, San Juan.'],['historia','Historia','Guerras, imperios, épocas y hechos históricos.']]],
+  ['deportes','⚽','Deportes',[
+    ['deportes','Deportes','Disciplinas individuales, de equipo y de motor.'],['deportistas','Deportistas','Atletas famosos, futbolistas, pilotos y campeones.'],['equipos','Equipos','Clubes, selecciones, ligas y mundiales.'],['equipamiento','Equipamiento','Balones, raquetas, bicicletas, cascos y redes.']]],
+  ['juegos','🎮','Juegos',[
+    ['videojuegos','Videojuegos','Juegos de consola, PC, móviles y sagas.'],['juegos_mesa','Juegos de mesa','Naipes, tableros, dados y rompecabezas.'],['hobbies','Hobbies','Pasatiempos, camping y actividades al aire libre.']]],
+  ['objetos','🧰','Objetos',[
+    ['hogar','Hogar','Muebles, electrodomésticos, utensilios y cosas de casa.'],['ropa','Ropa','Prendas y calzado de todo tipo.'],['accesorios','Accesorios','Joyas, gafas, bolsos y complementos personales.'],['herramientas','Herramientas','Instrumentos de oficio, médicos o científicos.'],['tecnologia','Tecnología','Celulares, computadoras, cámaras y aparatos digitales.'],['juguetes','Juguetes','Muñecos, peluches y juguetes de todo tipo.']]],
+  ['vida_cotidiana','🏙️','Vida Cotidiana',[
+    ['profesiones','Profesiones','Empleos, cargos, trabajadores y especialidades.'],['transporte','Transporte','Autos, aviones, barcos, trenes y medios para viajar.'],['espacios','Espacios','Habitaciones de la casa, tiendas, hospitales y sitios públicos.'],['marcas','Marcas','Empresas famosas, cadenas comerciales y logos conocidos.'],['apps','Apps','Redes sociales, sitios web, software y servicios digitales.']]],
+  ['ciencia','🔬','Ciencia',[
+    ['espacio','Espacio','Planetas, estrellas, galaxias, constelaciones y fenómenos espaciales.'],['cuerpo_humano','Cuerpo humano','Órganos, huesos, músculos y sistemas.'],['salud','Salud','Enfermedades, medicamentos y tratamientos.'],['materiales','Materiales','Elementos químicos, metales, gases, minerales y sustancias.'],['fenomenos_fisicos','Fenómenos físicos','Gravedad, electricidad, luz, sonido, energía y clima.'],['plantas','Plantas','Árboles, flores, cactus y helechos.'],['inventos','Inventos','Inventos, descubrimientos y aparatos históricos.'],['matematicas','Matemáticas','Figuras geométricas, números, unidades de medida y cálculos.']]],
+  ['acciones_frases','💬','Acciones y Frases',[
+    ['mimica','Mímica','Las palabras están prohibidas en esta categoría.'],['refranes','Refranes','Proverbios populares, sabiduría tradicional y frases hechas.'],['jerga','Jerga','Expresiones coloquiales, regionalismos y palabras de moda.'],['frases_celebres','Frases célebres','Citas históricas, lemas famosos y palabras icónicas.']]],
+  ['otros_jugadores','👥','Otros Jugadores',[
+    ['jugadores','Jugadores','Nombres de quienes participan en la partida.']]]
+];
+const CATEGORIES_DEF = Object.fromEntries(CATEGORY_ROWS.map(([key, icon, label, rows]) => [key, {
+  icon, label,
+  subcats: Object.fromEntries(rows.map(([subKey, subLabel, description]) => [subKey, {
+    icon: '🔹', label: subLabel, description, file: key === 'otros_jugadores' ? '__players__' : `${key}_${subKey}.json`
+  }]))
+}]));
 
 /* ── Settings ─── */
 const settings = { vibrate: true, animations: true };
@@ -984,6 +985,7 @@ function vibrate(ms=50) { if (settings.vibrate && navigator.vibrate) navigator.v
 
 /* ── State ─── */
 let players = [];          // { name, avatar, score, color }
+let archivedPlayers = [];
 let currentRound = 0;
 let totalRounds = 3;
 let gameMode = 're_perdido';
@@ -996,6 +998,11 @@ let currentTurn = 0;
 let votes = [];            // votes[voterIndex] = accusedIndex
 let roundsHistory = [];    // per-round recap
 let editingCustomKey = null;
+let selectedCategoryKey = '';
+let selectedSubcategories = new Set();
+let categoryGroups = [];
+let matchInProgress = false;
+let continueMatch = false;
 
 /* ── Player Management ─── */
 const PLAYER_COLORS = [
@@ -1036,9 +1043,25 @@ function addPlayer() {
 }
 
 function removePlayer(i) {
+  if (matchInProgress) {
+    const removed = players.splice(i, 1)[0];
+    archivedPlayers.push(removed);
+    if (impostorIndex > i) impostorIndex--;
+    else if (impostorIndex === i && players.length) impostorIndex = Math.floor(Math.random() * players.length);
+    if (currentTurn > i) currentTurn--;
+    votes = votes.map(v => v === i ? -1 : v > i ? v - 1 : v);
+    renderPlayerList();
+    return;
+  }
   players.splice(i, 1);
   renderPlayerList();
   vibrate();
+}
+
+function confirmClearPlayers() {
+  Swal.fire({ title:'Eliminar todos', text:'¿Borrar todos los jugadores?', icon:'warning', showCancelButton:true, confirmButtonText:'Eliminar', cancelButtonText:'Cancelar', confirmButtonColor:'#EF476F' }).then(r => {
+    if (r.isConfirmed) { players = []; archivedPlayers = []; renderPlayerList(); }
+  });
 }
 
 /* ── Player Edit Modal (avatar + color) ─── */
@@ -1173,12 +1196,12 @@ function renderCategoryRoot() {
   // Built-in — flat categories go direct to load, others open submenu
   let html = Object.entries(CATEGORIES_DEF).map(([key, cat]) => {
     if (cat.flat) {
-      return `<div class="cat-card" onclick="selectFlatCategory('${key}')">
+      return `<div class="cat-card" style="${selectedCategoryKey === key ? 'outline:2px solid var(--btn-primary)' : ''}" onclick="selectFlatCategory('${key}')">
         <span class="cat-icon">${cat.icon}</span>
         <span class="cat-name">${cat.label}</span>
       </div>`;
     }
-    return `<div class="cat-card" onclick="openParentCategory('${key}')">
+    return `<div class="cat-card" style="${selectedCategoryKey.startsWith(key + ':') ? 'outline:2px solid var(--btn-primary)' : ''}" onclick="openParentCategory('${key}')">
       <span class="cat-icon">${cat.icon}</span>
       <span class="cat-name">${cat.label}</span>
       <span class="cat-count">${Object.keys(cat.subcats).length} subcategorías</span>
@@ -1188,7 +1211,7 @@ function renderCategoryRoot() {
   // Custom
   const customs = getCustomCategories();
   html += customs.map(c => `
-    <div class="cat-card cat-custom-card" onclick="selectCustomCategory('${c.key}')">
+    <div class="cat-card cat-custom-card" style="${selectedCategoryKey === c.key ? 'outline:2px solid var(--btn-primary)' : ''}" onclick="selectCustomCategory('${c.key}')">
       <span class="cat-icon">${c.icon}</span>
       <span class="cat-name">${escHtml(c.name)}</span>
       <span class="cat-count">${c.words.length} palabras</span>
@@ -1217,14 +1240,14 @@ function openParentCategory(parentKey) {
 
   const grid = document.getElementById('catGrid');
   // Mix all option
-  let html = `<div class="cat-card cat-mix" onclick="selectMixAll('${parentKey}')">
+  let html = `<div class="cat-card cat-mix" style="${selectedCategoryKey === `${parentKey}:all` ? 'outline:2px solid var(--btn-primary)' : ''}" onclick="selectMixAll('${parentKey}')">
     <span class="cat-icon">🔀</span>
     <span class="cat-name">Mezclar todas</span>
     <span class="cat-count">Combina todas las palabras</span>
   </div>`;
 
   html += Object.entries(cat.subcats).map(([subKey, sub]) => `
-    <div class="cat-card" onclick="selectSubcategory('${parentKey}','${subKey}')">
+    <div class="cat-card" style="${selectedCategoryKey === `${parentKey}:${subKey}` ? 'outline:2px solid var(--btn-primary)' : ''}" onclick="selectSubcategory('${parentKey}','${subKey}')">
       <span class="cat-icon">${sub.icon}</span>
       <span class="cat-name">${sub.label}</span>
     </div>
@@ -1238,6 +1261,7 @@ async function selectSubcategory(parentKey, subKey) {
   const words = await loadWords(sub.file, parentKey, subKey);
   if (!words) return;
   categoryWords = words;
+  selectedCategoryKey = `${parentKey}:${subKey}`;
   categoryLabel = `${CATEGORIES_DEF[parentKey].icon} ${sub.label}`;
   proceedToGameConfig();
 }
@@ -1259,6 +1283,7 @@ async function selectMixAll(parentKey) {
     return;
   }
   categoryWords = all;
+  selectedCategoryKey = `${parentKey}:all`;
   categoryLabel = `${cat.icon} ${cat.label} (mezclado)`;
   proceedToGameConfig();
 }
@@ -1269,6 +1294,7 @@ async function selectFlatCategory(key) {
   const words = await loadWords(cat.file, key, key);
   if (!words) return;
   categoryWords = words;
+  selectedCategoryKey = key;
   categoryLabel = `${cat.icon} ${cat.label}`;
   proceedToGameConfig();
 }
@@ -1282,7 +1308,122 @@ function selectCustomCategory(key) {
     return;
   }
   categoryWords = cat.words;
+  selectedCategoryKey = key;
   categoryLabel = `${cat.icon} ${cat.name}`;
+  proceedToGameConfig();
+}
+
+function allCategoryKeys() {
+  return Object.entries(CATEGORIES_DEF).flatMap(([parent, cat]) => Object.keys(cat.subcats).map(sub => `${parent}:${sub}`))
+    .concat(getCustomCategories().map(cat => `custom:${cat.key}`));
+}
+
+function renderCategoryRoot() {
+  document.getElementById('catBreadcrumb').textContent = 'Categorías';
+  document.getElementById('catSubtitle').textContent = 'Elige una o varias subcategorías y pulsa Aceptar';
+  const grid = document.getElementById('catGrid');
+  let html = Object.entries(CATEGORIES_DEF).map(([key, cat]) => {
+    const keys = Object.keys(cat.subcats).map(sub => `${key}:${sub}`);
+    const count = keys.filter(k => selectedSubcategories.has(k)).length;
+    const selected = count === keys.length;
+    return `<div class='cat-card ${selected ? 'selected' : ''}' onclick="if(categoryLongPressed){categoryLongPressed=false;return}openParentCategory('${key}')" oncontextmenu="event.preventDefault();if(!categoryLongPressed)toggleCategorySelection('${key}')" onpointerdown="startCategoryHold(event,'${key}')" onpointerup="cancelCategoryHold()" onpointerleave="cancelCategoryHold()">
+      <span class='cat-icon'>${cat.icon}</span><span class='cat-name'>${cat.label}</span>
+    </div>`;
+  }).join('');
+  html += getCustomCategories().map(c => {
+    const selected = selectedSubcategories.has(`custom:${c.key}`);
+    return `<div class='cat-card cat-custom-card ${selected ? 'selected' : ''}'>
+      <span class='cat-icon'>${c.icon}</span><span class='cat-name'>${escHtml(c.name)}</span>
+      <span class='cat-count'>${c.words.length} palabras</span>
+      <button class='btn btn-ghost btn-sm' onclick="toggleCustomCategory('${c.key}')">${selected ? 'Quitar selección' : 'Seleccionar'}</button>
+      <div class='custom-cat-actions'>
+        <button class='btn btn-ghost btn-sm' onclick="editCustomCategory('${c.key}')" style='padding:.2rem .45rem;font-size:.72rem;min-height:28px'>✏️</button>
+        <button class='btn btn-danger btn-sm' onclick="deleteCustomCategory('${c.key}')" style='padding:.2rem .45rem;font-size:.72rem;min-height:28px'>🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+  html += `<div class='cat-card cat-add-new' onclick='openCustomCatModal()'><span class='cat-icon'>➕</span><span class='cat-name'>Crear categoría</span></div>`;
+  grid.innerHTML = html;
+  document.getElementById('selectAllCategoriesBtn').textContent = selectedSubcategories.size === allCategoryKeys().length ? 'Quitar todas' : 'Seleccionar todas las categorías';
+}
+
+let categoryHoldTimer = null;
+let categoryLongPressed = false;
+function startCategoryHold(event, parentKey) {
+  categoryHoldTimer = setTimeout(() => {
+    categoryLongPressed = true;
+    toggleCategorySelection(parentKey);
+    setTimeout(() => { categoryLongPressed = false; }, 700);
+  }, 550);
+}
+function cancelCategoryHold() {
+  clearTimeout(categoryHoldTimer);
+  categoryHoldTimer = null;
+}
+
+function toggleCategorySelection(parentKey) {
+  const keys = Object.keys(CATEGORIES_DEF[parentKey].subcats).map(sub => `${parentKey}:${sub}`);
+  const select = keys.some(key => !selectedSubcategories.has(key));
+  keys.forEach(key => select ? selectedSubcategories.add(key) : selectedSubcategories.delete(key));
+  renderCategoryRoot();
+}
+
+function toggleAllCategories() {
+  const keys = allCategoryKeys();
+  if (keys.every(key => selectedSubcategories.has(key))) keys.forEach(key => selectedSubcategories.delete(key));
+  else keys.forEach(key => selectedSubcategories.add(key));
+  catNavigationStack = [];
+  renderCategoryRoot();
+}
+
+function toggleCustomCategory(key) {
+  const id = `custom:${key}`;
+  selectedSubcategories.has(id) ? selectedSubcategories.delete(id) : selectedSubcategories.add(id);
+  renderCategoryRoot();
+}
+
+function openParentCategory(parentKey) {
+  const cat = CATEGORIES_DEF[parentKey];
+  catNavigationStack = [parentKey];
+  document.getElementById('catBreadcrumb').innerHTML = `<span class='dim-crumb' onclick='renderCategoryRoot();catNavigationStack=[]' style='cursor:pointer'>Categorías</span> › ${cat.label}`;
+  document.getElementById('catSubtitle').textContent = 'Selecciona una o varias subcategorías';
+  document.getElementById('catGrid').innerHTML = Object.entries(cat.subcats).map(([subKey, sub]) => {
+    const id = `${parentKey}:${subKey}`;
+    const selected = selectedSubcategories.has(id);
+    return `<div class='cat-card ${selected ? 'selected' : ''}' onclick="toggleSubcategory('${parentKey}','${subKey}')">
+      <span class='cat-icon'>${sub.icon}</span><span class='cat-name'>${sub.label}</span>
+      <span class='cat-count'>${escHtml(sub.description || '')}</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleSubcategory(parentKey, subKey) {
+  const key = `${parentKey}:${subKey}`;
+  selectedSubcategories.has(key) ? selectedSubcategories.delete(key) : selectedSubcategories.add(key);
+  openParentCategory(parentKey);
+}
+
+async function acceptSelectedCategories() {
+  const groups = [];
+  for (const key of selectedSubcategories) {
+    if (key.startsWith('custom:')) {
+      const cat = getCustomCategories().find(item => item.key === key.slice(7));
+      if (cat && cat.words.length) groups.push({ key, label: cat.name, words: cat.words });
+      continue;
+    }
+    const [parentKey, subKey] = key.split(':');
+    const sub = CATEGORIES_DEF[parentKey]?.subcats[subKey];
+    if (!sub) continue;
+    const words = await loadWords(sub.file, parentKey, subKey);
+    if (words?.length) groups.push({ key, label: sub.label, words });
+  }
+  categoryGroups = groups;
+  categoryWords = [...new Set(groups.flatMap(group => group.words))];
+  if (!categoryWords.length) {
+    Swal.fire({ icon:'warning', title:'Sin palabras disponibles', text:'Añade palabras a los archivos de las subcategorías seleccionadas.', confirmButtonColor:'#F4D03F' });
+    return;
+  }
+  categoryLabel = groups.length > 3 ? `${groups.length} subcategorías seleccionadas` : groups.map(group => group.label).join(', ');
   proceedToGameConfig();
 }
 
@@ -1299,7 +1440,7 @@ async function loadWords(file, parentKey, subKey) {
     const data = await resp.json();
     // Accept array or { words: [] }
     const words = Array.isArray(data) ? data : (data.words || data.items || Object.values(data));
-    if (!Array.isArray(words) || words.length < 2) throw new Error('Formato inválido');
+    if (!Array.isArray(words)) throw new Error('Formato inválido');
     wordCache[cacheKey] = words.map(w => String(w));
     return wordCache[cacheKey];
   } catch(e) {
@@ -1345,14 +1486,20 @@ function selectMode(el) {
 
 /* ── Game Start ─── */
 function startGame() {
-  if (categoryWords.length < 2) {
-    Swal.fire({ icon:'error', title:'Sin palabras', text:'La categoría no tiene palabras suficientes.', confirmButtonColor:'#F4D03F' });
+  const requiredWords = gameMode === 'requete_perdido' ? 2 : 1;
+  if (!categoryGroups.some(group => new Set(group.words).size >= requiredWords)) {
+    Swal.fire({ icon:'error', title:'Sin palabras suficientes', text:gameMode === 'requete_perdido' ? 'Selecciona una subcategoría con al menos dos palabras.' : 'Añade palabras a una subcategoría seleccionada.', confirmButtonColor:'#F4D03F' });
     return;
   }
-  currentRound = 0;
-  usedWords = [];
-  roundsHistory = [];
-  players.forEach(p => p.score = 0);
+  if (!continueMatch) {
+    currentRound = 0;
+    usedWords = [];
+    roundsHistory = [];
+    players.forEach(p => p.score = 0);
+    archivedPlayers = [];
+  }
+  continueMatch = false;
+  matchInProgress = true;
   startRound();
 }
 
@@ -1360,13 +1507,16 @@ function startRound() {
   currentRound++;
   // Pick impostor
   impostorIndex = Math.floor(Math.random() * players.length);
-  // Pick words
-  let pool = categoryWords.filter(w => !usedWords.includes(w));
-  if (pool.length < (gameMode === 'requete_perdido' ? 2 : 1)) {
-    // reset when 80% used
+  const requiredWords = gameMode === 'requete_perdido' ? 2 : 1;
+  let pools = categoryGroups.map(group => ({ group, words: [...new Set(group.words)].filter(word => !usedWords.includes(word)) }))
+    .filter(pool => pool.words.length >= requiredWords);
+  if (!pools.length) {
     usedWords = [];
-    pool = [...categoryWords];
+    pools = categoryGroups.map(group => ({ group, words: [...new Set(group.words)] }))
+      .filter(pool => pool.words.length >= requiredWords);
   }
+  const selectedPool = pools[Math.floor(Math.random() * pools.length)];
+  let pool = selectedPool.words;
   // Shuffle pool
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i+1));
@@ -1375,7 +1525,7 @@ function startRound() {
   mainWord = pool[0];
   usedWords.push(mainWord);
   if (gameMode === 'requete_perdido') {
-    altWord = pool[1] || pool[0];
+    altWord = pool[1];
     usedWords.push(altWord);
   } else {
     altWord = '';
@@ -1531,6 +1681,7 @@ function calculateResults() {
   roundsHistory.push({
     round: currentRound,
     impostor: impostorIndex,
+    impostorPlayer: players[impostorIndex],
     mainWord, altWord, gameMode,
     votes: [...votes],
     deltas: [...roundDeltas],
@@ -1598,14 +1749,17 @@ function proceedAfterRound() {
   const isLastRound = totalRounds !== 0 && currentRound >= totalRounds;
   if (isLastRound) {
     showFinalSummary();
-  } else {
-    startRound();
+    return;
   }
+  continueMatch = true;
+  catNavigationStack = [];
+  renderCategoryRoot();
+  showScreen('categoryScreen');
 }
 
 /* ── Final Summary ─── */
 function showFinalSummary() {
-  const sorted = [...players].sort((a, b) => b.score - a.score);
+  const sorted = [...players, ...archivedPlayers].sort((a, b) => b.score - a.score);
 
   // Podium (top 3)
   const podiumEl = document.getElementById('podium');
@@ -1643,7 +1797,7 @@ function showFinalSummary() {
 
   // Round history
   document.getElementById('roundHistory').innerHTML = roundsHistory.map(r => {
-    const imp = players[r.impostor];
+    const imp = r.impostorPlayer;
     return `<div class="card" style="font-size:.88rem; border-left: 4px solid ${imp.color || '#118AB2'}; background: ${imp.color || 'var(--surface)'}22;">
       <strong>Ronda ${r.round}</strong> — Impostor: <img src="${imp.avatar}" alt="" style="width:16px;height:16px;object-fit:contain;border-radius:50%;vertical-align:middle;margin-right:4px;"> ${escHtml(imp.name)}
       · Palabra: <em>${escHtml(r.mainWord)}</em>
@@ -1672,15 +1826,24 @@ function endMatchEarly() {
 
 /* ── Play Again / New Game ─── */
 function playAgain() {
+  players = [...players, ...archivedPlayers];
+  archivedPlayers = [];
   players.forEach(p => p.score = 0);
   currentRound = 0;
   usedWords = [];
   roundsHistory = [];
-  proceedToGameConfig();
+  matchInProgress = false;
+  continueMatch = false;
+  catNavigationStack = [];
+  renderCategoryRoot();
+  showScreen('categoryScreen');
 }
 
 function newGame() {
-  players = [];
+  players = [...players, ...archivedPlayers];
+  archivedPlayers = [];
+  matchInProgress = false;
+  continueMatch = false;
   renderPlayerList();
   showScreen('setupScreen');
 }
