@@ -157,11 +157,23 @@
     #setupScreen .logo-area h1 { letter-spacing: -1px; }
     #setupScreen .logo-area p { color: var(--text-dim); margin-top: .4rem; font-size: .95rem; }
 
+    .welcome-screen {
+      position: fixed; inset: 0; z-index: 300; display: flex; align-items: center;
+      justify-content: center; padding: 1.25rem; background: var(--bg);
+      transition: transform .65s cubic-bezier(.7,0,.2,1);
+    }
+    .welcome-screen.leaving { transform: translateY(-100%); }
+    .welcome-content { display: flex; flex-direction: column; gap: .8rem; width: 100%; max-width: 380px; text-align: center; }
+    .welcome-content .logo-emoji { width: 72px; height: 72px; object-fit: contain; margin: 0 auto; }
+    .welcome-content p { color: var(--text-dim); margin-bottom: .5rem; }
+
     .add-player-row {
-      display: flex; gap: .5rem; margin-bottom: 1rem;
+      display: flex; flex-direction: column; align-items: center; gap: .5rem;
+      max-width: 420px; margin: 0 auto 1rem;
     }
     .add-player-row input {
-      flex: 1; background: var(--surface); border: 1.5px solid var(--border);
+      flex: none; width: 100%; text-align: center;
+      background: var(--surface); border: 1.5px solid var(--border);
       border-radius: var(--radius); padding: .75rem 1rem;
       color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 1rem;
       outline: none; transition: border-color .2s;
@@ -203,6 +215,8 @@
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: .75rem;
     }
+    .category-search { width: 100%; margin-bottom: .8rem; padding: .75rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); font: inherit; outline: none; }
+    .category-search:focus { border-color: var(--btn-primary); }
     .cat-card {
       background: var(--surface);
       border: 1.5px solid var(--border);
@@ -426,6 +440,7 @@
     .podium-step .p-emoji { width: 36px; height: 36px; object-fit: contain; margin-bottom: .25rem; border-radius: 50%; }
     .podium-step .p-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .82rem; line-height: 1.2; margin-bottom: .35rem; }
     .podium-step .p-pts  { font-size: .78rem; color: var(--text-dim); margin-bottom: .35rem; }
+    .podium-step .p-name, .podium-step .p-pts { color: #F9F9F9 !important; text-shadow: 0 1px 2px rgba(0,0,0,.65); }
     .podium-step .p-bar  { width: 100%; border-radius: 8px 8px 0 0; }
     .podium-step.rank-1 .p-bar { background: var(--btn-primary); height: 80px; }
     .podium-step.rank-2 .p-bar { background: var(--card2); height: 55px; }
@@ -481,35 +496,6 @@
     }
     .icon-pick:hover { background: var(--card); }
     .icon-pick.selected { border-color: var(--btn-primary); background: rgba(244,208,63,.12); }
-
-    /* ===== VIBRATE SETTINGS ===== */
-    .toggle-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: .75rem 0; border-bottom: 1px solid var(--border);
-    }
-    .toggle-row:last-child { border: none; }
-    .toggle {
-      position: relative; width: 46px; height: 26px; cursor: pointer;
-    }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider {
-      position: absolute; inset: 0;
-      background: var(--surface);
-      border-radius: 50px;
-      border: 1.5px solid var(--border);
-      transition: background .2s;
-    }
-    .toggle-slider::after {
-      content: ''; position: absolute;
-      width: 18px; height: 18px;
-      background: var(--text-dim);
-      border-radius: 50%;
-      top: 50%; left: 3px;
-      transform: translateY(-50%);
-      transition: left .2s, background .2s;
-    }
-    .toggle input:checked + .toggle-slider { background: rgba(244,208,63,.2); border-color: var(--btn-primary); }
-    .toggle input:checked + .toggle-slider::after { left: 23px; background: var(--btn-primary); }
 
     
     /* ===== PLAYER COLORS ===== */
@@ -654,6 +640,16 @@
 <body>
 <div id="app">
 
+  <div id="welcomeScreen" class="welcome-screen">
+    <div class="welcome-content">
+      <img class="logo-emoji" src="assets/logo.png" alt="">
+      <h1>Re Perdido</h1>
+      <p>El juego del impostor y las palabras secretas</p>
+      <button class="btn btn-ghost btn-lg btn-full" onclick="openHowToPlay()">Cómo jugar</button>
+      <button class="btn btn-primary btn-lg btn-full" onclick="beginGame()">Comenzar</button>
+    </div>
+  </div>
+
   <!-- ==============================
        SCREEN 1: PLAYER SETUP
   ============================== -->
@@ -664,14 +660,13 @@
       <p>El juego del impostor y las palabras secretas</p>
     </div>
     <div class="page-content">
-      <div class="section-label">Jugadores</div>
       <div class="add-player-row">
         <input type="text" id="playerNameInput" placeholder="Nombre del jugador…" maxlength="24"
                onkeydown="if(event.key==='Enter') addPlayer()" autocomplete="off" />
         <button class="btn btn-primary btn-sm" onclick="addPlayer()">+ Añadir</button>
       </div>
       <div id="playerList"></div>
-      <div id="minWarning" class="warning-text" style="display:none">¡Se necesitan al menos 2 jugadores!</div>
+      <div id="minWarning" class="warning-text" style="display:none">¡Se necesitan al menos 3 jugadores!</div>
       <div class="setup-actions">
         <button class="btn btn-ghost btn-sm" onclick="randomizeOrder()" style="flex:1">🔀 Randomizar</button>
         <button class="btn btn-ghost btn-sm" onclick="confirmClearPlayers()" title="Eliminar todos" aria-label="Eliminar todos" style="flex:1">🗑️ Borrar todos</button>
@@ -694,10 +689,11 @@
       </div>
     </div>
     <div class="page-content">
+      <input type="search" id="categorySearch" class="category-search" placeholder="Buscar categorías, subcategorías..." oninput="renderCategorySearch()" autocomplete="off">
       <div id="catGrid" class="cat-grid"></div>
     </div>
     <div class="bottom-actions">
-      <button class="btn btn-ghost btn-full" id="selectAllCategoriesBtn" onclick="toggleAllCategories()">Seleccionar todas</button>
+      <button class="btn btn-ghost btn-full" id="selectAllCategoriesBtn" onclick="toggleAllCategories()">Seleccionar todo</button>
       <button class="btn btn-primary btn-lg btn-full" id="acceptCategoriesBtn" onclick="acceptSelectedCategories()">Aceptar selección</button>
     </div>
   </div>
@@ -721,13 +717,16 @@
       <div class="mode-cards">
         <div class="mode-card selected" data-mode="re_perdido" onclick="selectMode(this)">
           <div class="mode-title">🔇 Re Perdido</div>
-          <div class="mode-desc">El impostor no ve ninguna palabra y debe bluffear a ciegas.</div>
+          <div class="mode-desc">Los perdidos no ven la palabra y deben bluffear a ciegas.</div>
         </div>
         <div class="mode-card" data-mode="requete_perdido" onclick="selectMode(this)">
           <div class="mode-title">🔀 Requete Perdido</div>
-          <div class="mode-desc">Todos ven palabras, pero el impostor ve una diferente.</div>
+          <div class="mode-desc">Todos ven una palabra; los perdidos reciben otra.</div>
         </div>
       </div>
+      <hr class="divider">
+      <div class="section-label">Cantidad de perdidos</div>
+      <div class="config-option-grid" id="impostorCountGrid"></div>
     </div>
     <div class="bottom-actions">
       <button class="btn btn-primary btn-lg btn-full" onclick="startGame()">¡Comenzar Partida! 🎮</button>
@@ -742,6 +741,7 @@
       <div class="round-info" id="barRoundInfo">R1/3</div>
       <div class="scores-row" id="barScores"></div>
       <div class="bar-end">
+        <button class="btn btn-ghost btn-sm" id="unknownWordBtn" onclick="reportUnknownWord()" title="No conozco esta palabra" aria-label="No conozco esta palabra" disabled>?</button>
         <button class="btn btn-ghost btn-sm" onclick="endMatchEarly()">✕</button>
       </div>
     </div>
@@ -865,6 +865,18 @@
   </div>
 </div>
 
+<div id="howToPlayModal" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Cómo jugar</h2>
+    <p class="dim">Utilizando un solo dispositivo, añadan al menos tres jugadores, elijan categorías y configuren la partida. Cada jugador mira su palabra en secreto en su turno y aprieta en siguiente antes de pasarla a otro jugador.</p>
+    <p class="dim">En cada turno den pistas sin decir nada muy específico y menos la palabra. Antes de empezar la votación se hará al menos una ronda de preguntas de un jugador para otro para tratar de  descartar dudas. El perdido debe mezclarse con el grupo sin conocer la palabra.</p>
+    <p class="dim">Si alguien no conoce la palabra, puede avisar con el botón de pista difícil para sortear otra. Al terminar, verán los puntos y el historial.</p>
+    <div class="modal-footer">
+      <button class="btn btn-primary btn-full" onclick="closeHowToPlay()">Salir</button>
+    </div>
+  </div>
+</div>
+
 <!-- ==============================
      MODAL: Edit Player Avatar/Color
 ============================== -->
@@ -886,38 +898,6 @@
   </div>
 </div>
 
-<!-- ==============================
-     MODAL: Settings
-============================== -->
-<div id="settingsModal" class="modal-overlay">
-  <div class="modal-box">
-    <h2>⚙️ Ajustes</h2>
-    <div class="toggle-row">
-      <div>
-        <div style="font-family:'Syne';font-weight:600">Vibración</div>
-        <div class="dim" style="font-size:.82rem">Feedback al mostrar palabras y votar</div>
-      </div>
-      <label class="toggle">
-        <input type="checkbox" id="vibrateToggle" checked onchange="saveSetting('vibrate',this.checked)">
-        <span class="toggle-slider"></span>
-      </label>
-    </div>
-    <div class="toggle-row">
-      <div>
-        <div style="font-family:'Syne';font-weight:600">Animaciones</div>
-        <div class="dim" style="font-size:.82rem">Transiciones y efectos</div>
-      </div>
-      <label class="toggle">
-        <input type="checkbox" id="animToggle" checked onchange="saveSetting('animations',this.checked)">
-        <span class="toggle-slider"></span>
-      </label>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary btn-full" onclick="closeSettings()">Listo</button>
-    </div>
-  </div>
-</div>
-
 <script>
 /* ============================================================
    ¡RE PERDIDO! — Complete Game Logic
@@ -926,19 +906,19 @@
 /* ── Categories definition (embedded for offline use) ─── */
 const CATEGORY_ROWS = [
   ['animales','🐾','Animales',[
-    ['mamiferos','Mamíferos','Mamíferos salvajes de tierra firme: leones, monos, osos.'],['aves','Aves','Animales con plumas, pico y alas.'],['reptiles_anfibios','Reptiles y anfibios','Escamas, sangre fría, ranas, serpientes y tortugas.'],['marinos','Marinos','Peces, ballenas, delfines, pulpos, medusas y crustáceos.'],['bichos','Bichos','Insectos y arácnidos: arañas, abejas y mariposas.'],['domesticos','Domésticos','Animales de compañía y de granja.'],['extintos','Extintos','Dinosaurios, mamuts y especies desaparecidas.']]],
+    ['mamiferos','Mamíferos','Mamíferos salvajes de tierra firme: leones, monos, osos.'],['aves','Aves','Animales con plumas, pico y alas.'],['reptiles_anfibios','Reptiles y anfibios','Escamas, sangre fría, ranas, serpientes y tortugas.'],['marinos','Marinos','Peces, ballenas, delfines, pulpos, medusas y crustáceos.'],['bichos','Bichos','Insectos y arácnidos: arañas, abejas y mariposas.'],['domesticos','Domésticos','Animales de compañía y de granja.'],['extintos','Extintos','Dinosaurios, mamuts y especies desaparecidas.'],['animales_generales','Animales (lista anterior)','Lista general conservada de la categoría anterior.']]],
   ['comida_bebida','🍲','Comida y Bebida',[
-    ['vegetales','Vegetales','Frutas, verduras, raíces, granos y hongos.'],['origen_animal','Origen animal','Carnes, pescados, huevos, lácteos y miel.'],['harinas','Harinas','Pan, pasta, harinas y cereales de caja.'],['platos','Platos','Comidas hechas que mezclan ingredientes.'],['dulces','Dulces','Golosinas, pasteles, helados y azúcar.'],['bebidas','Bebidas','Todo lo que se toma en vaso o taza.'],['condimentos','Condimentos','Aderezos, salsas, especias, sal, aceites y grasas.'],['snacks','Snacks','Papas fritas, galletas, maní y cosas saladas para picar.']]],
+    ['vegetales','Vegetales','Frutas, verduras, raíces, granos y hongos.'],['frutas','Frutas','Frutas de la lista anterior.'],['origen_animal','Origen animal','Carnes, pescados, huevos, lácteos y miel.'],['harinas','Harinas','Pan, pasta, harinas y cereales de caja.'],['platos','Platos','Comidas hechas que mezclan ingredientes.'],['dulces','Dulces','Golosinas, pasteles, helados y azúcar.'],['bebidas','Bebidas','Todo lo que se toma en vaso o taza.'],['condimentos','Condimentos','Aderezos, salsas, especias, sal, aceites y grasas.'],['snacks','Snacks','Papas fritas, galletas, maní y cosas saladas para picar.'],['alimentos','Alimentos','Lista general de alimentos conservada de la categoría anterior.']]],
   ['geografia','🌍','Geografía',[
-    ['paises','Países','Naciones soberanas del mundo.'],['provincias','Provincias','Estados, provincias y departamentos de un país.'],['regiones','Regiones','Continentes y zonas geográficas o culturales.'],['ciudades','Ciudades','Capitales, metrópolis, pueblos y barrios conocidos.'],['monumentos','Monumentos','Maravillas, ruinas, puentes y edificios icónicos.'],['aguas','Aguas','Ríos, lagos, mares, penínsulas y playas.'],['naturaleza','Naturaleza','Montañas, volcanes, desiertos y biomas.']]],
+    ['paises','Países','Naciones soberanas del mundo.'],['capitales','Capitales','Capitales nacionales del mundo.'],['provincias','Provincias','Estados, provincias y departamentos de un país.'],['regiones','Regiones','Continentes y zonas geográficas o culturales.'],['ciudades','Ciudades','Capitales, metrópolis, pueblos y barrios conocidos.'],['monumentos','Monumentos','Maravillas, ruinas, puentes y edificios icónicos.'],['aguas','Aguas','Ríos, lagos, mares, penínsulas y playas.'],['naturaleza','Naturaleza','Montañas, volcanes, desiertos y biomas.']]],
   ['cine_tv','🎬','Cine y TV',[
-    ['peliculas_clasicas','Películas clásicas','Éxitos históricos de antes del 2000.'],['cine_moderno','Cine moderno','Estrenos, blockbusters y películas desde el 2000.'],['sagas','Sagas','Universos cinematográficos y secuelas famosas.'],['actores','Actores','Estrellas de la pantalla grande y directores.'],['series','Series','Dramas, comedias, sitcoms y streaming.'],['doramas','Doramas','Series coreanas, japonesas y otras producciones asiáticas.'],['realities','Realities','Concursos, talentos y telerrealidad.'],['telenovelas','Telenovelas','Dramas televisivos y producciones clásicas.'],['presentadores','Presentadores','Conductores, periodistas y estrellas de televisión.'],['caricaturas','Caricaturas occidentales','Dibujos animados de EE. UU. y Europa.'],['peliculas_animadas','Películas animadas','Largometrajes de estudios como Disney o Pixar.'],['animacion_asiatica','Animación asiática','Anime, donghua, animación coreana y otros.']]],
+    ['peliculas_clasicas','Películas clásicas','Éxitos históricos de antes del 2000.'],['cine_moderno','Cine moderno','Estrenos, blockbusters y películas desde el 2000.'],['peliculas_generales','Películas (lista anterior)','Catálogo general conservado de la categoría anterior.'],['sagas','Sagas','Universos cinematográficos y secuelas famosas.'],['actores','Actores','Estrellas de la pantalla grande y directores.'],['series','Series','Dramas, comedias, sitcoms y streaming.'],['doramas','Doramas','Series coreanas, japonesas y otras producciones asiáticas.'],['realities','Realities','Concursos, talentos y telerrealidad.'],['telenovelas','Telenovelas','Dramas televisivos y producciones clásicas.'],['presentadores','Presentadores','Conductores, periodistas y estrellas de televisión.'],['caricaturas','Caricaturas occidentales','Dibujos animados de EE. UU. y Europa.'],['peliculas_animadas','Películas animadas','Largometrajes de estudios como Disney o Pixar.'],['animacion_asiatica','Animación asiática','Anime, donghua, animación coreana y otros.']]],
   ['musica','🎵','Música',[
     ['musicos','Músicos','Solistas, grupos y dúos musicales.'],['hits_actuales','Hits actuales','Canciones populares y éxitos modernos.'],['clasicos_retro','Clásicos retro','Canciones antiguas, rock clásico y recuerdos.'],['musica_regional','Música regional','Artistas y canciones del folclore y la música local.'],['kpop','K-pop','Grupos y solistas coreanos y música pop asiática.'],['instrumentos','Instrumentos','Guitarras, tambores, pianos y todo lo que se toca.'],['generos','Géneros','Rock, cumbia, jazz, reggaetón y otros estilos.']]],
   ['literatura','📚','Literatura',[
     ['libros','Libros','Obras literarias, cuentos y best-sellers.'],['comics','Cómics','Historietas y novelas gráficas occidentales.'],['manga','Manga','Cómics japoneses y sus franquicias.'],['webtoons','Webtoons','Cómics coreanos, chinos y digitales.'],['escritores','Escritores','Novelistas, poetas y creadores famosos.']]],
   ['ficcion','✨','Ficción',[
-    ['personajes_occidentales','Personajes occidentales','Héroes, antihéroes, villanos o personajes secundarios.'],['personajes_orientales','Personajes orientales','Héroes, villanos y protagonistas de obras modernas.'],['criaturas','Criaturas','Alienígenas, monstruos, dragones y especies inventadas.'],['escenarios','Escenarios','Mundos imaginarios, planetas, reinos y escuelas.'],['organizaciones','Organizaciones','Desde equipos de héroes hasta imperios galácticos.'],['artefactos','Artefactos','Armas legendarias, reliquias y objetos mágicos.'],['poderes','Poderes','Magia, superpoderes y habilidades especiales.']]],
+    ['personajes_occidentales','Personajes occidentales','Héroes, antihéroes, villanos o personajes secundarios.'],['superheroes','Superhéroes','Héroes, villanos y equipos de superhéroes.'],['personajes_orientales','Personajes orientales','Héroes, villanos y protagonistas de obras modernas.'],['criaturas','Criaturas','Alienígenas, monstruos, dragones y especies inventadas.'],['escenarios','Escenarios','Mundos imaginarios, planetas, reinos y escuelas.'],['organizaciones','Organizaciones','Desde equipos de héroes hasta imperios galácticos.'],['artefactos','Artefactos','Armas legendarias, reliquias y objetos mágicos.'],['poderes','Poderes','Magia, superpoderes y habilidades especiales.']]],
   ['personas','👤','Personas',[
     ['lideres','Líderes','Presidentes, gobernantes y realeza de la actualidad.'],['empresarios','Empresarios','Fundadores de empresas, millonarios e inventores.'],['historicos','Históricos','Próceres, filósofos, científicos y reyes del pasado.'],['creadores_digitales','Creadores digitales','Youtubers, streamers, influencers y figuras de internet.'],['celebridades','Celebridades','Modelos, filántropos y figuras públicas generales.']]],
   ['arte_cultura','🎭','Arte y Cultura',[
@@ -948,9 +928,9 @@ const CATEGORY_ROWS = [
   ['juegos','🎮','Juegos',[
     ['videojuegos','Videojuegos','Juegos de consola, PC, móviles y sagas.'],['juegos_mesa','Juegos de mesa','Naipes, tableros, dados y rompecabezas.'],['hobbies','Hobbies','Pasatiempos, camping y actividades al aire libre.']]],
   ['objetos','🧰','Objetos',[
-    ['hogar','Hogar','Muebles, electrodomésticos, utensilios y cosas de casa.'],['ropa','Ropa','Prendas y calzado de todo tipo.'],['accesorios','Accesorios','Joyas, gafas, bolsos y complementos personales.'],['herramientas','Herramientas','Instrumentos de oficio, médicos o científicos.'],['tecnologia','Tecnología','Celulares, computadoras, cámaras y aparatos digitales.'],['juguetes','Juguetes','Muñecos, peluches y juguetes de todo tipo.']]],
+    ['hogar','Hogar','Muebles, electrodomésticos, utensilios y cosas de casa.'],['ropa','Ropa','Prendas y calzado de todo tipo.'],['accesorios','Accesorios','Joyas, gafas, bolsos y complementos personales.'],['herramientas','Herramientas','Instrumentos de oficio, médicos o científicos.'],['tecnologia','Tecnología','Celulares, computadoras, cámaras y aparatos digitales.'],['juguetes','Juguetes','Muñecos, peluches y juguetes de todo tipo.'],['objetos_generales','Objetos (lista anterior)','Lista general conservada de la categoría anterior.']]],
   ['vida_cotidiana','🏙️','Vida Cotidiana',[
-    ['profesiones','Profesiones','Empleos, cargos, trabajadores y especialidades.'],['transporte','Transporte','Autos, aviones, barcos, trenes y medios para viajar.'],['espacios','Espacios','Habitaciones de la casa, tiendas, hospitales y sitios públicos.'],['marcas','Marcas','Empresas famosas, cadenas comerciales y logos conocidos.'],['apps','Apps','Redes sociales, sitios web, software y servicios digitales.']]],
+    ['profesiones','Profesiones','Empleos, cargos, trabajadores y especialidades.'],['transporte','Transporte','Autos, aviones, barcos, trenes y medios para viajar.'],['espacios','Espacios','Habitaciones de la casa, tiendas, hospitales y sitios públicos.'],['marcas','Marcas','Empresas famosas, cadenas comerciales y logos conocidos.'],['franquicias','Franquicias','Cadenas comerciales conocidas conservadas de la categoría anterior.'],['apps','Apps','Redes sociales, sitios web, software y servicios digitales.']]],
   ['ciencia','🔬','Ciencia',[
     ['espacio','Espacio','Planetas, estrellas, galaxias, constelaciones y fenómenos espaciales.'],['cuerpo_humano','Cuerpo humano','Órganos, huesos, músculos y sistemas.'],['salud','Salud','Enfermedades, medicamentos y tratamientos.'],['materiales','Materiales','Elementos químicos, metales, gases, minerales y sustancias.'],['fenomenos_fisicos','Fenómenos físicos','Gravedad, electricidad, luz, sonido, energía y clima.'],['plantas','Plantas','Árboles, flores, cactus y helechos.'],['inventos','Inventos','Inventos, descubrimientos y aparatos históricos.'],['matematicas','Matemáticas','Figuras geométricas, números, unidades de medida y cálculos.']]],
   ['acciones_frases','💬','Acciones y Frases',[
@@ -965,23 +945,17 @@ const CATEGORIES_DEF = Object.fromEntries(CATEGORY_ROWS.map(([key, icon, label, 
   }]))
 }]));
 
-/* ── Settings ─── */
-const settings = { vibrate: true, animations: true };
-function loadSettings() {
-  try {
-    const s = JSON.parse(localStorage.getItem('rp_settings') || '{}');
-    Object.assign(settings, s);
-    document.getElementById('vibrateToggle').checked = settings.vibrate !== false;
-    document.getElementById('animToggle').checked    = settings.animations !== false;
-  } catch(e) {}
+function openHowToPlay() { document.getElementById('howToPlayModal').classList.add('open'); }
+function closeHowToPlay() { document.getElementById('howToPlayModal').classList.remove('open'); }
+function beginGame() {
+  const welcome = document.getElementById('welcomeScreen');
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    welcome.remove();
+    return;
+  }
+  requestAnimationFrame(() => welcome.classList.add('leaving'));
+  setTimeout(() => welcome.remove(), 700);
 }
-function saveSetting(key, val) {
-  settings[key] = val;
-  localStorage.setItem('rp_settings', JSON.stringify(settings));
-}
-function openSettings()  { document.getElementById('settingsModal').classList.add('open'); }
-function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
-function vibrate(ms=50) { if (settings.vibrate && navigator.vibrate) navigator.vibrate(ms); }
 
 /* ── State ─── */
 let players = [];          // { name, avatar, score, color }
@@ -992,7 +966,9 @@ let gameMode = 're_perdido';
 let categoryWords = [];    // current word pool
 let categoryLabel = '';
 let usedWords = [];
-let impostorIndex = -1;
+let impostorCount = 1;
+let impostorIndices = [];
+let unfamiliarReports = new Set();
 let mainWord = '', altWord = '';
 let currentTurn = 0;
 let votes = [];            // votes[voterIndex] = accusedIndex
@@ -1039,15 +1015,18 @@ function addPlayer() {
   players.push({ name, avatar, score: 0, color });
   inp.value = '';
   renderPlayerList();
-  vibrate();
 }
 
 function removePlayer(i) {
   if (matchInProgress) {
     const removed = players.splice(i, 1)[0];
     archivedPlayers.push(removed);
-    if (impostorIndex > i) impostorIndex--;
-    else if (impostorIndex === i && players.length) impostorIndex = Math.floor(Math.random() * players.length);
+    const removedWasImpostor = impostorIndices.includes(i);
+    impostorIndices = impostorIndices.filter(index => index !== i).map(index => index > i ? index - 1 : index);
+    if (removedWasImpostor && players.length > impostorIndices.length) {
+      const available = players.map((_, index) => index).filter(index => !impostorIndices.includes(index));
+      impostorIndices.push(available[Math.floor(Math.random() * available.length)]);
+    }
     if (currentTurn > i) currentTurn--;
     votes = votes.map(v => v === i ? -1 : v > i ? v - 1 : v);
     renderPlayerList();
@@ -1055,7 +1034,6 @@ function removePlayer(i) {
   }
   players.splice(i, 1);
   renderPlayerList();
-  vibrate();
 }
 
 function confirmClearPlayers() {
@@ -1087,13 +1065,11 @@ function openPlayerEditModal(i) {
 function choosePickAvatar(a) {
   editPickAvatar = a;
   document.querySelectorAll('#avatarPickGrid .avatar-pick').forEach(el => el.classList.toggle('selected', el.src.endsWith(a)));
-  vibrate(20);
 }
 
 function choosePickColor(c) {
   editPickColor = c;
   document.querySelectorAll('#colorPickGrid .color-pick').forEach(el => el.classList.toggle('selected', el.title === c));
-  vibrate(20);
 }
 
 function savePlayerEdit() {
@@ -1102,7 +1078,6 @@ function savePlayerEdit() {
   players[editingPlayerIdx].color = editPickColor;
   closePlayerEditModal();
   renderPlayerList();
-  vibrate(30);
 }
 
 function closePlayerEditModal() {
@@ -1116,13 +1091,12 @@ function randomizeOrder() {
     [players[i], players[j]] = [players[j], players[i]];
   }
   renderPlayerList();
-  vibrate(30);
 }
 
 function renderPlayerList() {
   const el = document.getElementById('playerList');
   if (players.length === 0) {
-    el.innerHTML = '<p class="dim text-center" style="padding:.75rem 0">No hay jugadores aún. ¡Añade al menos 2!</p>';
+    el.innerHTML = '<p class="dim text-center" style="padding:.75rem 0">No hay jugadores aún. ¡Añade al menos 3!</p>';
     document.getElementById('minWarning').style.display = 'none';
     return;
   }
@@ -1137,7 +1111,7 @@ function renderPlayerList() {
       <button class="p-del" onclick="event.stopPropagation();removePlayer(${i})" title="Eliminar">✕</button>
     </div>`;
   }).join('');
-  document.getElementById('minWarning').style.display = players.length < 2 ? 'block' : 'none';
+  document.getElementById('minWarning').style.display = players.length < 3 ? 'block' : 'none';
 
   // Re-init sortable
   if (window._sortable) window._sortable.destroy();
@@ -1160,6 +1134,11 @@ function showScreen(id) {
   window.scrollTo(0, 0);
 }
 function goBackCategory() {
+  if (document.getElementById('categorySearch').value.trim()) {
+    document.getElementById('categorySearch').value = '';
+    renderCategoryRoot();
+    return;
+  }
   if (catNavigationStack.length > 0) {
     // We're in a parent category view, go back to root
     catNavigationStack = [];
@@ -1179,16 +1158,18 @@ let selectedCatWords = null;
 let selectedCatLabel = '';
 
 function goToCategories() {
-  if (players.length < 2) {
-    Swal.fire({ icon:'warning', title:'Pocos jugadores', text:'¡Necesitas al menos 2 jugadores!', confirmButtonColor:'#F4D03F' });
+  if (players.length < 3) {
+    Swal.fire({ icon:'warning', title:'Pocos jugadores', text:'¡Necesitas al menos 3 jugadores para mantener menos del 49% de perdidos!', confirmButtonColor:'#F4D03F' });
     return;
   }
+  document.getElementById('categorySearch').value = '';
   catNavigationStack = [];
   renderCategoryRoot();
   showScreen('categoryScreen');
 }
 
 function renderCategoryRoot() {
+  if (document.getElementById('categorySearch').value.trim()) return renderCategorySearch();
   document.getElementById('catBreadcrumb').textContent = 'Categorías';
   document.getElementById('catSubtitle').textContent   = 'Elige una categoría de palabras';
   const grid = document.getElementById('catGrid');
@@ -1319,6 +1300,7 @@ function allCategoryKeys() {
 }
 
 function renderCategoryRoot() {
+  if (document.getElementById('categorySearch').value.trim()) return renderCategorySearch();
   document.getElementById('catBreadcrumb').textContent = 'Categorías';
   document.getElementById('catSubtitle').textContent = 'Elige una o varias subcategorías y pulsa Aceptar';
   const grid = document.getElementById('catGrid');
@@ -1344,7 +1326,7 @@ function renderCategoryRoot() {
   }).join('');
   html += `<div class='cat-card cat-add-new' onclick='openCustomCatModal()'><span class='cat-icon'>➕</span><span class='cat-name'>Crear categoría</span></div>`;
   grid.innerHTML = html;
-  document.getElementById('selectAllCategoriesBtn').textContent = selectedSubcategories.size === allCategoryKeys().length ? 'Quitar todas' : 'Seleccionar todas las categorías';
+  updateCategorySelectionButton();
 }
 
 let categoryHoldTimer = null;
@@ -1365,7 +1347,8 @@ function toggleCategorySelection(parentKey) {
   const keys = Object.keys(CATEGORIES_DEF[parentKey].subcats).map(sub => `${parentKey}:${sub}`);
   const select = keys.some(key => !selectedSubcategories.has(key));
   keys.forEach(key => select ? selectedSubcategories.add(key) : selectedSubcategories.delete(key));
-  renderCategoryRoot();
+  if (catNavigationStack[0] === parentKey) openParentCategory(parentKey);
+  else renderCategoryRoot();
 }
 
 function toggleAllCategories() {
@@ -1374,6 +1357,15 @@ function toggleAllCategories() {
   else keys.forEach(key => selectedSubcategories.add(key));
   catNavigationStack = [];
   renderCategoryRoot();
+}
+
+function updateCategorySelectionButton(parentKey = null) {
+  const button = document.getElementById('selectAllCategoriesBtn');
+  const keys = parentKey
+    ? Object.keys(CATEGORIES_DEF[parentKey].subcats).map(sub => `${parentKey}:${sub}`)
+    : allCategoryKeys();
+  button.textContent = keys.length && keys.every(key => selectedSubcategories.has(key)) ? 'Quitar todo' : 'Seleccionar todo';
+  button.onclick = parentKey ? () => toggleCategorySelection(parentKey) : toggleAllCategories;
 }
 
 function toggleCustomCategory(key) {
@@ -1387,6 +1379,7 @@ function openParentCategory(parentKey) {
   catNavigationStack = [parentKey];
   document.getElementById('catBreadcrumb').innerHTML = `<span class='dim-crumb' onclick='renderCategoryRoot();catNavigationStack=[]' style='cursor:pointer'>Categorías</span> › ${cat.label}`;
   document.getElementById('catSubtitle').textContent = 'Selecciona una o varias subcategorías';
+  updateCategorySelectionButton(parentKey);
   document.getElementById('catGrid').innerHTML = Object.entries(cat.subcats).map(([subKey, sub]) => {
     const id = `${parentKey}:${subKey}`;
     const selected = selectedSubcategories.has(id);
@@ -1395,6 +1388,48 @@ function openParentCategory(parentKey) {
       <span class='cat-count'>${escHtml(sub.description || '')}</span>
     </div>`;
   }).join('');
+}
+
+function normalizeCategorySearch(value) {
+  return value.toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function renderCategorySearch() {
+  const query = normalizeCategorySearch(document.getElementById('categorySearch').value.trim());
+  if (!query) {
+    if (catNavigationStack.length) openParentCategory(catNavigationStack[0]);
+    else renderCategoryRoot();
+    return;
+  }
+  const grid = document.getElementById('catGrid');
+  const results = [];
+  Object.entries(CATEGORIES_DEF).forEach(([parentKey, cat]) => {
+    if (normalizeCategorySearch(cat.label).includes(query)) {
+      const selected = Object.keys(cat.subcats).every(sub => selectedSubcategories.has(`${parentKey}:${sub}`));
+      results.push(`<div class='cat-card ${selected ? 'selected' : ''}' onclick="document.getElementById('categorySearch').value='';catNavigationStack=[];openParentCategory('${parentKey}')"><span class='cat-icon'>${cat.icon}</span><span class='cat-name'>${cat.label}</span><span class='cat-count'>Categoría</span></div>`);
+    }
+    Object.entries(cat.subcats).forEach(([subKey, sub]) => {
+      if (![cat.label, sub.label, sub.description || ''].some(text => normalizeCategorySearch(text).includes(query))) return;
+      const selected = selectedSubcategories.has(`${parentKey}:${subKey}`);
+      results.push(`<div class='cat-card ${selected ? 'selected' : ''}' onclick="toggleSearchSubcategory('${parentKey}','${subKey}')"><span class='cat-icon'>${sub.icon}</span><span class='cat-name'>${sub.label}</span><span class='cat-count'>${cat.label} · ${escHtml(sub.description || '')}</span></div>`);
+    });
+  });
+  getCustomCategories().forEach(cat => {
+    if (!normalizeCategorySearch(cat.name).includes(query)) return;
+    const selected = selectedSubcategories.has(`custom:${cat.key}`);
+    results.push(`<div class='cat-card ${selected ? 'selected' : ''}' onclick="toggleCustomCategory('${cat.key}')"><span class='cat-icon'>${cat.icon}</span><span class='cat-name'>${escHtml(cat.name)}</span><span class='cat-count'>Categoría personalizada</span></div>`);
+  });
+  document.getElementById('catBreadcrumb').textContent = 'Resultados';
+  document.getElementById('catSubtitle').textContent = `${results.length} resultados`;
+  grid.innerHTML = results.length ? results.join('') : `<p class='dim'>No se encontraron resultados.</p>`;
+  catNavigationStack = [];
+  updateCategorySelectionButton();
+}
+
+function toggleSearchSubcategory(parentKey, subKey) {
+  const key = `${parentKey}:${subKey}`;
+  selectedSubcategories.has(key) ? selectedSubcategories.delete(key) : selectedSubcategories.add(key);
+  renderCategorySearch();
 }
 
 function toggleSubcategory(parentKey, subKey) {
@@ -1458,10 +1493,27 @@ async function loadWords(file, parentKey, subKey) {
 function proceedToGameConfig() {
   document.getElementById('configCatLabel').textContent = categoryLabel;
   renderRoundsGrid();
+  renderImpostorCountGrid();
   showScreen('gameConfigScreen');
 }
 
 const ROUND_OPTIONS = [1, 2, 3, 5, 10, '∞'];
+function maxImpostorsForCount(count) {
+  return Math.max(0, Math.ceil(count * 0.49) - 1);
+}
+function renderImpostorCountGrid() {
+  const max = maxImpostorsForCount(players.length);
+  impostorCount = Math.min(Math.max(1, impostorCount), max);
+  document.getElementById('impostorCountGrid').innerHTML = Array.from({ length:max }, (_, i) => i + 1).map(count => `
+    <button class="option-btn ${impostorCount === count ? 'selected' : ''}" onclick="selectImpostorCount(${count})">
+      ${count}<span class="opt-label">${count === 1 ? 'perdido' : 'perdidos'}</span>
+    </button>
+  `).join('');
+}
+function selectImpostorCount(count) {
+  impostorCount = count;
+  renderImpostorCountGrid();
+}
 function renderRoundsGrid() {
   const g = document.getElementById('roundsGrid');
   g.innerHTML = ROUND_OPTIONS.map(r => {
@@ -1486,6 +1538,10 @@ function selectMode(el) {
 
 /* ── Game Start ─── */
 function startGame() {
+  if (players.length < 3) {
+    Swal.fire({ icon:'warning', title:'Pocos jugadores', text:'¡Necesitas al menos 3 jugadores para mantener menos del 49% de perdidos!', confirmButtonColor:'#F4D03F' });
+    return;
+  }
   const requiredWords = gameMode === 'requete_perdido' ? 2 : 1;
   if (!categoryGroups.some(group => new Set(group.words).size >= requiredWords)) {
     Swal.fire({ icon:'error', title:'Sin palabras suficientes', text:gameMode === 'requete_perdido' ? 'Selecciona una subcategoría con al menos dos palabras.' : 'Añade palabras a una subcategoría seleccionada.', confirmButtonColor:'#F4D03F' });
@@ -1503,18 +1559,21 @@ function startGame() {
   startRound();
 }
 
-function startRound() {
-  currentRound++;
-  // Pick impostor
-  impostorIndex = Math.floor(Math.random() * players.length);
+function startRound(reroll = false) {
   const requiredWords = gameMode === 'requete_perdido' ? 2 : 1;
   let pools = categoryGroups.map(group => ({ group, words: [...new Set(group.words)].filter(word => !usedWords.includes(word)) }))
     .filter(pool => pool.words.length >= requiredWords);
   if (!pools.length) {
-    usedWords = [];
-    pools = categoryGroups.map(group => ({ group, words: [...new Set(group.words)] }))
+    usedWords = reroll ? [mainWord, altWord].filter(Boolean) : [];
+    pools = categoryGroups.map(group => ({ group, words: [...new Set(group.words)].filter(word => !usedWords.includes(word)) }))
       .filter(pool => pool.words.length >= requiredWords);
   }
+  if (!pools.length) return false;
+  if (!reroll) currentRound++;
+  impostorCount = Math.min(impostorCount, maxImpostorsForCount(players.length));
+  const shuffledPlayers = players.map((_, index) => index).sort(() => Math.random() - 0.5);
+  impostorIndices = shuffledPlayers.slice(0, impostorCount);
+  unfamiliarReports = new Set();
   const selectedPool = pools[Math.floor(Math.random() * pools.length)];
   let pool = selectedPool.words;
   // Shuffle pool
@@ -1533,6 +1592,7 @@ function startRound() {
   currentTurn = 0;
   votes = [];
   showWordTurn();
+  return true;
 }
 
 /* ── Word Reveal ─── */
@@ -1556,21 +1616,54 @@ function showWordTurn() {
   document.getElementById('revealHint').style.display = 'block';
   document.getElementById('nextTurnBtn').disabled = true;
   document.getElementById('wordCard').style.pointerEvents = 'auto';
+  updateUnfamiliarButton();
   showScreen('wordScreen');
+}
+
+function isImpostor(index) {
+  return impostorIndices.includes(index);
+}
+
+function updateUnfamiliarButton() {
+  const button = document.getElementById('unknownWordBtn');
+  const excluded = gameMode === 're_perdido' && isImpostor(currentTurn);
+  button.style.display = excluded ? 'none' : 'inline-flex';
+  button.disabled = excluded || !document.getElementById('wordCardInner').classList.contains('flipped') || unfamiliarReports.has(players[currentTurn]);
+}
+
+function maxUnfamiliarReports() {
+  return Math.min(2, Math.max(1, Math.floor(players.length * 0.2)));
+}
+
+function reportUnknownWord() {
+  const player = players[currentTurn];
+  if (!player || !document.getElementById('wordCardInner').classList.contains('flipped')) return;
+  unfamiliarReports.add(player);
+  if (unfamiliarReports.size > maxUnfamiliarReports()) {
+    if (!startRound(true)) {
+      unfamiliarReports.delete(player);
+      updateUnfamiliarButton();
+      Swal.fire({ toast:true, position:'top', icon:'info', title:'No hay otra palabra disponible en esta selección.', showConfirmButton:false, timer:2200 });
+      return;
+    }
+    Swal.fire({ toast:true, position:'top', icon:'info', title:'Varios jugadores no conocen la palabra. Nueva ronda.', showConfirmButton:false, timer:1800 });
+    return;
+  }
+  updateUnfamiliarButton();
+  Swal.fire({ toast:true, position:'top', icon:'info', title:'Aviso registrado. Puedes consultar la palabra.', showConfirmButton:false, timer:2200 });
 }
 
 function revealWord() {
   const inner = document.getElementById('wordCardInner');
   if (inner.classList.contains('flipped')) return;
-  vibrate(60);
-  const isImpostor = (currentTurn === impostorIndex);
+  const isImpostorPlayer = isImpostor(currentTurn);
   let word, hint;
-  if (isImpostor && gameMode === 're_perdido') {
+  if (isImpostorPlayer && gameMode === 're_perdido') {
     word = '¡Estás re perdido!';
     hint = 'No conoces la palabra — ¡bluffea!';
     document.getElementById('wordFaceFront').classList.add('impostor-face');
     document.getElementById('wordTextEl').classList.add('impostor-text');
-  } else if (isImpostor && gameMode === 'requete_perdido') {
+  } else if (isImpostorPlayer && gameMode === 'requete_perdido') {
     word = altWord;
     hint = 'Esta es la palabra de la ronda';
     // No impostor-face / impostor-text: card looks identical to everyone else
@@ -1584,10 +1677,10 @@ function revealWord() {
   document.getElementById('revealHint').style.display = 'none';
   document.getElementById('nextTurnBtn').disabled = false;
   document.getElementById('wordCard').style.pointerEvents = 'none';
+  updateUnfamiliarButton();
 }
 
 function nextTurn() {
-  vibrate(40);
   currentTurn++;
   if (currentTurn >= players.length) {
     startVoting();
@@ -1629,7 +1722,6 @@ function showVoterUI() {
 }
 
 function castVote(accusedIndex) {
-  vibrate(50);
   votes[currentVoterIndex] = accusedIndex;
   currentVoterIndex++;
   if (currentVoterIndex >= players.length) {
@@ -1642,14 +1734,10 @@ function castVote(accusedIndex) {
 /* ── Scoring ─── */
 function calculateResults() {
   const n = players.length;
-  const nonImpostors = players.filter((_, i) => i !== impostorIndex);
-  const nonImpCount  = nonImpostors.length;
-
-  // Count how many non-impostors voted correctly
-  let correctVotes = 0;
-  for (let i = 0; i < n; i++) {
-    if (i !== impostorIndex && votes[i] === impostorIndex) correctVotes++;
-  }
+  const impostorSet = new Set(impostorIndices);
+  const nonImpostors = players.map((_, i) => i).filter(i => !impostorSet.has(i));
+  const nonImpCount = nonImpostors.length;
+  const correctVotes = nonImpostors.filter(i => impostorSet.has(votes[i])).length;
 
   const majority = correctVotes >= (nonImpCount / 2);
   const allCorrect = correctVotes === nonImpCount;
@@ -1657,8 +1745,8 @@ function calculateResults() {
   const roundDeltas = new Array(n).fill(0);
 
   for (let i = 0; i < n; i++) {
-    if (i === impostorIndex) continue;
-    if (votes[i] === impostorIndex) {
+    if (impostorSet.has(i)) continue;
+    if (impostorSet.has(votes[i])) {
       // Correct voter
       roundDeltas[i] = majority ? 60 : 20;
       if (allCorrect) roundDeltas[i] += 20; // team bonus
@@ -1666,13 +1754,10 @@ function calculateResults() {
     // wrong voters get 0
   }
 
-  // Impostor
   if (!majority) {
-    // Impostor NOT caught by majority
     const wrongVotes = nonImpCount - correctVotes;
-    roundDeltas[impostorIndex] = 50 + (wrongVotes * 10);
+    impostorIndices.forEach(i => roundDeltas[i] = 50 + (wrongVotes * 10));
   }
-  // If majority caught impostor → impostor gets 0
 
   // Apply deltas
   players.forEach((p, i) => p.score += roundDeltas[i]);
@@ -1680,8 +1765,8 @@ function calculateResults() {
   // Store recap
   roundsHistory.push({
     round: currentRound,
-    impostor: impostorIndex,
-    impostorPlayer: players[impostorIndex],
+    impostors: [...impostorIndices],
+    impostorPlayers: impostorIndices.map(i => players[i]),
     mainWord, altWord, gameMode,
     votes: [...votes],
     deltas: [...roundDeltas],
@@ -1694,22 +1779,21 @@ function calculateResults() {
 }
 
 function showResults(deltas, majority, correctVotes, nonImpCount) {
-  const imp = players[impostorIndex];
+  const impostors = impostorIndices.map(i => players[i]);
   const roundLabel = totalRounds === 0 ? `Ronda ${currentRound}` : `Ronda ${currentRound} / ${totalRounds}`;
   document.getElementById('resultsTitle').textContent = roundLabel;
 
   // Impostor reveal
   document.getElementById('resultReveal').innerHTML = `
-    <p class="dim">El impostor era…</p>
+    <p class="dim">Los perdidos eran…</p>
     <div class="impostor-reveal">
-      <img class="big-avatar" src="${imp.avatar}" alt="">
-      <div class="impostor-name">${escHtml(imp.name)}</div>
+      ${impostors.map(imp => `<div style="display:inline-block;margin:.4rem .75rem"><img class="big-avatar" src="${imp.avatar}" alt=""><div class="impostor-name">${escHtml(imp.name)}</div></div>`).join('')}
       <div class="word-info">
         Palabra principal: <strong>${escHtml(mainWord)}</strong>
         ${gameMode === 'requete_perdido' ? `&nbsp;·&nbsp; Palabra del impostor: <strong>${escHtml(altWord)}</strong>` : ''}
       </div>
     </div>
-    <p class="dim">${correctVotes} de ${nonImpCount} detectaron al impostor</p>
+    <p class="dim">${correctVotes} de ${nonImpCount} detectaron a un perdido</p>
   `;
 
   // Team banner
@@ -1719,10 +1803,10 @@ function showResults(deltas, majority, correctVotes, nonImpCount) {
     tb.textContent = '✅ ¡Los detectives ganaron esta ronda!';
   } else if (correctVotes === 0) {
     tb.className = 'team-banner impostor-wins';
-    tb.textContent = '🎭 ¡El impostor pasó desapercibido!';
+    tb.textContent = '🎭 ¡Los perdidos pasaron desapercibidos!';
   } else {
     tb.className = 'team-banner impostor-wins';
-    tb.textContent = '🎭 El impostor escapó de la mayoría';
+    tb.textContent = '🎭 Los perdidos escaparon de la mayoría';
   }
 
   // Score table
@@ -1732,7 +1816,7 @@ function showResults(deltas, majority, correctVotes, nonImpCount) {
     const textColor = getContrastColor(item.p.color || '#118AB2');
     return `<tr style="--player-color:${item.p.color || '#118AB2'}; --player-text:${textColor}">
       <td class="td-rank">${rank+1}</td>
-      <td><div class="td-player"><img src="${item.p.avatar}" alt="" style="width:20px;height:20px;object-fit:contain;border-radius:50%;"><span>${escHtml(item.p.name)}</span>${item.i === impostorIndex ? '&nbsp;<span title="Impostor" style="font-size:.8rem">🎭</span>' : ''}</div></td>
+      <td><div class="td-player"><img src="${item.p.avatar}" alt="" style="width:20px;height:20px;object-fit:contain;border-radius:50%;"><span>${escHtml(item.p.name)}</span>${isImpostor(item.i) ? '&nbsp;<span title="Perdido" style="font-size:.8rem">🎭</span>' : ''}</div></td>
       <td class="td-delta ${item.d > 0 ? 'delta-positive' : ''}">${item.d > 0 ? '+' : ''}${item.d}</td>
       <td class="td-total">${item.p.score} total</td>
     </tr>`;
@@ -1752,6 +1836,7 @@ function proceedAfterRound() {
     return;
   }
   continueMatch = true;
+  document.getElementById('categorySearch').value = '';
   catNavigationStack = [];
   renderCategoryRoot();
   showScreen('categoryScreen');
@@ -1772,15 +1857,13 @@ function showFinalSummary() {
   const medals = ['🥈', '🥇', '🥉'];
 
   podiumEl.innerHTML = podiumOrder.map((p, i) => {
-    const rankIdx = sorted.findIndex(s => s === p);
     const cls = rankClasses[i] || 'rank-2';
     const medal = medals[i] || '';
-    const textColor = getContrastColor(p.color || '#118AB2');
     return `<div class="podium-step ${cls}">
       <div class="p-medal">${medal}</div>
       <img class="p-emoji" src="${p.avatar}" alt="" style="width:36px;height:36px;object-fit:contain;border-radius:50%;">
-      <div class="p-name" style="color:${textColor}">${escHtml(p.name)}</div>
-      <div class="p-pts" style="color:${textColor}">${p.score} pts</div>
+      <div class="p-name">${escHtml(p.name)}</div>
+      <div class="p-pts">${p.score ?? 0} pts</div>
       <div class="p-bar" style="background:${p.color || 'var(--btn-primary)'}"></div>
     </div>`;
   }).join('');
@@ -1797,11 +1880,12 @@ function showFinalSummary() {
 
   // Round history
   document.getElementById('roundHistory').innerHTML = roundsHistory.map(r => {
-    const imp = r.impostorPlayer;
-    return `<div class="card" style="font-size:.88rem; border-left: 4px solid ${imp.color || '#118AB2'}; background: ${imp.color || 'var(--surface)'}22;">
-      <strong>Ronda ${r.round}</strong> — Impostor: <img src="${imp.avatar}" alt="" style="width:16px;height:16px;object-fit:contain;border-radius:50%;vertical-align:middle;margin-right:4px;"> ${escHtml(imp.name)}
+    const imps = r.impostorPlayers;
+    const impMarkup = imps.map(imp => `<img src="${imp.avatar}" alt="" style="width:16px;height:16px;object-fit:contain;border-radius:50%;vertical-align:middle;margin-right:4px;"> ${escHtml(imp.name)}`).join(', ');
+    return `<div class="card" style="font-size:.88rem; border-left: 4px solid ${imps[0].color || '#118AB2'}; background: ${imps[0].color || 'var(--surface)'}22;">
+      <strong>Ronda ${r.round}</strong> — Perdidos: ${impMarkup}
       · Palabra: <em>${escHtml(r.mainWord)}</em>
-      · ${r.correctVotes}/${r.nonImpCount} detectaron
+      · ${r.correctVotes}/${r.nonImpCount} detectaron a un perdido
     </div>`;
   }).join('');
 
@@ -1834,6 +1918,7 @@ function playAgain() {
   roundsHistory = [];
   matchInProgress = false;
   continueMatch = false;
+  document.getElementById('categorySearch').value = '';
   catNavigationStack = [];
   renderCategoryRoot();
   showScreen('categoryScreen');
@@ -1937,7 +2022,6 @@ function saveCustomCategory() {
   saveCustomCategories(customs);
   closeCustomCatModal();
   renderCategoryRoot();
-  vibrate(40);
 }
 
 function editCustomCategory(key) {
@@ -1972,7 +2056,6 @@ function escHtml(str) {
 
 /* ── Init ─── */
 document.addEventListener('DOMContentLoaded', () => {
-  loadSettings();
   renderPlayerList();
 
   // Enter key on player input
